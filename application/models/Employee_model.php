@@ -21,4 +21,11 @@ class Employee_model extends CI_Model
 
 		return $this->db->insert('employees', $data);
 	}
+	public function get_employee_by_user_id($user_id)
+	{
+		return $this->db
+			->where('user_id', $user_id)
+			->get('employees')
+			->row();
+	}
 }

@@ -23,4 +23,9 @@ class Task_model extends CI_Model
 			->where('employees.user_id', $user_id)
 			->count_all_results();
 	}
+
+	public function create_task($task_data)
+	{
+		return $this->db->insert('tasks', $task_data);
+	}
 }

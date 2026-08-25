@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Dashboard - TaskLog</title>
+	<title>TaskLog</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
 	<style>
@@ -186,7 +186,6 @@
 
 						<a href="<?= site_url('tasks'); ?>" class="text-cyan text-decoration-none">
 							View All
-							<i class="bi bi-arrow-right ms-1"></i>
 						</a>
 					</div>
 
@@ -213,7 +212,7 @@
 
 					<?php else: ?>
 
-						<div class="table-responsive">
+						<div class="table-responsive rounded-2 overflow-hidden">
 							<table class="table table-dark table-borderless align-middle mb-0">
 								<thead>
 									<tr class="border-bottom border-tasklog">
