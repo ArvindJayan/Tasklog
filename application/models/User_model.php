@@ -39,7 +39,11 @@ class User_model extends CI_Model
 			'password' => password_hash($password, PASSWORD_DEFAULT)
 		];
 
-		return $this->db->insert('users', $data);
+		if (!$this->db->insert('users', $data)) {
+			return false;
+		}
+
+		return $this->db->insert_id();
 	}
 
 	public function email_exists($email)
