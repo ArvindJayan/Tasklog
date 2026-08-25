@@ -27,14 +27,14 @@ class Auth extends CI_Controller
 
 			if ($email === '' || $password === '') {
 				$this->session->set_flashdata('error', 'Email and password are required.');
-				redirect('login');
+				redirect('auth/login');
 			}
 
 			$user = $this->User_model->login($email, $password);
 
 			if (!$user) {
 				$this->session->set_flashdata('error', 'Invalid email or password.');
-				redirect('login');
+				redirect('auth/login');
 			}
 
 			$this->session->set_userdata([
@@ -54,6 +54,6 @@ class Auth extends CI_Controller
 	public function logout()
 	{
 		$this->session->sess_destroy();
-		redirect('login');
+		redirect('home');
 	}
 }
