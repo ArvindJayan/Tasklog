@@ -6,6 +6,7 @@ class User_model extends CI_Model
 	public function login($email, $password)
 	{
 		$user = $this->db
+			->select('id, role_id, name, email, password')
 			->where('email', $email)
 			->get('users')
 			->row();
@@ -13,6 +14,8 @@ class User_model extends CI_Model
 		if (!$user || !password_verify($password, $user->password)) {
 			return false;
 		}
+
+		unset($user->password);
 
 		return $user;
 	}

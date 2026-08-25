@@ -10,9 +10,14 @@ class Auth extends CI_Controller
 		$this->load->library('session');
 	}
 
+	public function is_authenticated()
+	{
+		return (bool) $this->session->userdata('logged_in');
+	}
+
 	public function login()
 	{
-		if ($this->session->userdata('user_id')) {
+		if ($this->is_authenticated()) {
 			redirect('dashboard');
 		}
 
@@ -34,8 +39,9 @@ class Auth extends CI_Controller
 
 			$this->session->set_userdata([
 				'user_id' => $user->id,
-				'email' => $user->email,
 				'role_id' => $user->role_id,
+				'name' => $user->name,
+				'email' => $user->email,
 				'logged_in' => true
 			]);
 
