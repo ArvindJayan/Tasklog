@@ -75,9 +75,9 @@
 </head>
 <body>
 	<nav class="navbar navbar-dark border-bottom border-tasklog">
-		<div class="container py-3">
+		<div class="container py-2">
 			<a class="navbar-brand fw-bold fs-2" href="<?= site_url(); ?>">Task<span class="text-cyan">Log</span></a>
-			<a href="<?= site_url('auth/login'); ?>" class="btn btn-info fw-semibold">Get Started</a>
+			<a href="<?= site_url('auth/login'); ?>" class="btn btn-info fs-5 fw-semibold">Get Started</a>
 		</div>
 	</nav>
 
@@ -86,10 +86,9 @@
 			<div class="container py-5">
 				<div class="row align-items-center g-5">
 					<div class="col-lg-6">
-						<span class="badge rounded-pill bg-dark border border-info text-info mb-4 px-3 py-2">Simple task management</span>
 						<h1 class="display-2 fw-bold lh-1 mb-4">Work smarter.<br><span class="text-cyan">Stay on track.</span></h1>
 						<p class="lead text-secondary mb-4">TaskLog gives employees and reporting authorities a simple way to assign, manage, and track work from one place.</p>
-						<a href="<?= site_url('auth/login'); ?>" class="btn btn-tasklog btn-lg px-4">Get Started</a>
+						<a href="<?= site_url('auth/login'); ?>" class="btn btn-info btn-lg fw-semibold">Access Dashbaord</a>
 					</div>
 
 					<div class="col-lg-6">

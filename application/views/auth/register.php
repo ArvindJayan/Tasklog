@@ -54,7 +54,7 @@
 						<a href="<?= base_url(); ?>" class="text-decoration-none">
 							<h2 class="fw-bold text-light">Task<span class="text-cyan">Log</span></h2>
 						</a>
-						<p class="text-secondary mb-0">Create your account</p>
+						<p class="text-secondary mb-0">Create a new account</p>
 					</div>
 
 					<?php if ($this->session->flashdata('error')): ?>
