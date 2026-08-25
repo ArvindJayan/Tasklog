@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Task_model extends CI_Model
+class Tasks_model extends CI_Model
 {
 	public function get_tasks_by_user($user_id)
 	{
@@ -27,5 +27,23 @@ class Task_model extends CI_Model
 	public function create_task($task_data)
 	{
 		return $this->db->insert('tasks', $task_data);
+	}
+
+	public function get_tasks_by_user_id($user_id)
+	{
+		return $this->db
+			->where('assigned_to', $user_id)
+			->order_by('created_at', 'DESC')
+			->get('tasks')
+			->result();
+	}
+
+	public function get_tasks_by_employee_id($employee_id)
+	{
+		return $this->db
+			->where('assigned_to', $employee_id)
+			->order_by('created_at', 'DESC')
+			->get('tasks')
+			->result();
 	}
 }

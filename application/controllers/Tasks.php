@@ -6,9 +6,29 @@ class Tasks extends CI_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('Task_model');
+		$this->load->model('Tasks_model');
+		$this->load->model('User_model');
 		$this->load->model('Employee_model');
 		$this->load->library('session');
+
+		if (!$this->session->userdata('logged_in')) {
+			redirect('auth/login');
+		}
+	}
+
+	public function index()
+	{
+		$user_id = $this->session->userdata('user_id');
+
+		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
+
+		if (!$employee) {
+			redirect('onboarding');
+		}
+
+		$data['tasks'] = $this->Tasks_model->get_tasks_by_employee_id($employee->id);
+
+		$this->load->view('tasks/index', $data);
 	}
 
 	private function is_authenticated()
@@ -50,7 +70,7 @@ class Tasks extends CI_Controller
 				'due_date' => $due_date ?: null
 			];
 
-			if ($this->Task_model->create_task($task_data)) {
+			if ($this->Tasks_model->create_task($task_data)) {
 				$this->session->set_flashdata('success', 'Task created successfully.');
 				redirect('dashboard');
 			}

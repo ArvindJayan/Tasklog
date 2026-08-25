@@ -14,9 +14,7 @@ class MY_Controller extends CI_Controller
 			redirect('auth/login');
 		}
 
-		$user_id = $this->session->userdata('user_id');
-
-		if (!$this->Employee_model->profile_exists($user_id)) {
+		if (!$this->Employee_model->get_employee_by_user_id($this->session->userdata('user_id'))) {
 			redirect('onboarding');
 		}
 	}
