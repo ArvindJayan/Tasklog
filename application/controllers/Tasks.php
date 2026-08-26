@@ -26,6 +26,18 @@ class Tasks extends Employee_Controller
 		$this->load->view('tasks/index', $data);
 	}
 
+	public function assigned()
+	{
+		if ($this->session->userdata('role_id') != 2) {
+			show_error('You do not have permission to access this page.', 403);
+		}
+
+		$data['tasks'] = $this->Tasks_model
+			->get_tasks_assigned_by_employee_id($this->employee->id);
+
+		$this->load->view('tasks/assigned', $data);
+	}
+
 	public function create()
 	{
 		$user_id = $this->session->userdata('user_id');
