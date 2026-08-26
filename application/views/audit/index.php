@@ -74,14 +74,88 @@
 			color: var(--tasklog-text);
 		}
 
+		.audit-table {
+			width: 100%;
+			table-layout: fixed;
+		}
+
+		.audit-table th,
+		.audit-table td {
+			vertical-align: middle;
+		}
+
+		.audit-col-user {
+			width: 18%;
+		}
+
+		.audit-col-action {
+			width: 22%;
+		}
+
+		.audit-col-entity {
+			width: 17%;
+		}
+
+		.audit-col-ip {
+			width: 15%;
+		}
+
+		.audit-col-date {
+			width: 18%;
+		}
+
+		.audit-col-view {
+			width: 10%;
+		}
+
 		.audit-row:hover {
 			background-color: rgba(34, 211, 238, 0.04);
 		}
 
-		.audit-values {
-			max-width: 350px;
+		.modal-content {
+			background-color: var(--tasklog-surface);
+			border-color: var(--tasklog-border);
+		}
+
+		.modal-header,
+		.modal-footer {
+			border-color: var(--tasklog-border);
+		}
+
+		.btn-close {
+			filter: invert(1);
+		}
+
+		.audit-detail {
+			background-color: var(--tasklog-bg);
+			border: 1px solid var(--tasklog-border);
+			border-radius: 0.5rem;
+			padding: 1rem;
+		}
+
+		.audit-detail-label {
+			font-size: 0.8rem;
+			color: var(--tasklog-muted);
+			margin-bottom: 0.25rem;
+		}
+
+		.audit-detail-value {
+			color: var(--tasklog-text);
+			word-break: break-word;
+		}
+
+		.audit-json {
+			background-color: #080d18;
+			border: 1px solid var(--tasklog-border);
+			border-radius: 0.5rem;
+			padding: 1rem;
 			white-space: pre-wrap;
 			word-break: break-word;
+			font-family: monospace;
+			font-size: 0.85rem;
+			color: var(--tasklog-secondary);
+			max-height: 300px;
+			overflow-y: auto;
 		}
 	</style>
 </head>
@@ -271,7 +345,16 @@
 
 					<div class="table-responsive">
 
-						<table class="table table-dark table-borderless align-middle mb-0">
+						<table class="table table-dark table-borderless align-middle mb-0 audit-table">
+
+							<colgroup>
+								<col class="audit-col-user">
+								<col class="audit-col-action">
+								<col class="audit-col-entity">
+								<col class="audit-col-ip">
+								<col class="audit-col-date">
+								<col class="audit-col-view">
+							</colgroup>
 
 							<thead>
 
@@ -290,15 +373,15 @@
 									</th>
 
 									<th class="px-4 py-3">
-										Changes
-									</th>
-
-									<th class="px-4 py-3">
 										IP Address
 									</th>
 
 									<th class="px-4 py-3 text-nowrap">
 										Date
+									</th>
+
+									<th class="px-4 py-3 text-end">
+										Action
 									</th>
 
 								</tr>
@@ -321,10 +404,7 @@
 
 					</div>
 
-					<div
-						id="pagination"
-						class="d-flex justify-content-center py-4"
-					></div>
+					<div id="pagination" class="d-flex justify-content-center py-4"></div>
 
 				</div>
 
@@ -334,11 +414,215 @@
 
 	</main>
 
+	<div
+		class="modal fade"
+		id="auditDetailModal"
+		tabindex="-1"
+		aria-labelledby="auditDetailModalLabel"
+		aria-hidden="true"
+	>
+
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+
+			<div class="modal-content">
+
+				<div class="modal-header">
+
+					<div>
+						<h5 class="modal-title fw-bold" id="auditDetailModalLabel">
+							Audit Log Details
+						</h5>
+
+						<small class="text-secondary" id="auditDetailAction"></small>
+					</div>
+
+					<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"
+					></button>
+
+				</div>
+
+				<div class="modal-body">
+
+					<div class="row g-3 mb-4">
+
+						<div class="col-md-6">
+
+							<div class="audit-detail">
+
+								<div class="audit-detail-label">
+									User
+								</div>
+
+								<div
+									class="audit-detail-value fw-semibold"
+									id="auditDetailUser"
+								></div>
+
+							</div>
+
+						</div>
+
+						<div class="col-md-6">
+
+							<div class="audit-detail">
+
+								<div class="audit-detail-label">
+									Action
+								</div>
+
+								<div
+									class="audit-detail-value"
+									id="auditDetailActionValue"
+								></div>
+
+							</div>
+
+						</div>
+
+						<div class="col-md-6">
+
+							<div class="audit-detail">
+
+								<div class="audit-detail-label">
+									Entity
+								</div>
+
+								<div
+									class="audit-detail-value"
+									id="auditDetailEntity"
+								></div>
+
+							</div>
+
+						</div>
+
+						<div class="col-md-6">
+
+							<div class="audit-detail">
+
+								<div class="audit-detail-label">
+									Entity ID
+								</div>
+
+								<div
+									class="audit-detail-value"
+									id="auditDetailEntityId"
+								></div>
+
+							</div>
+
+						</div>
+
+						<div class="col-md-6">
+
+							<div class="audit-detail">
+
+								<div class="audit-detail-label">
+									IP Address
+								</div>
+
+								<div
+									class="audit-detail-value"
+									id="auditDetailIp"
+								></div>
+
+							</div>
+
+						</div>
+
+						<div class="col-md-6">
+
+							<div class="audit-detail">
+
+								<div class="audit-detail-label">
+									Date
+								</div>
+
+								<div
+									class="audit-detail-value"
+									id="auditDetailDate"
+								></div>
+
+							</div>
+
+						</div>
+
+						<div class="col-12">
+
+							<div class="audit-detail">
+
+								<div class="audit-detail-label">
+									User Agent
+								</div>
+
+								<div
+									class="audit-detail-value"
+									id="auditDetailUserAgent"
+								></div>
+
+							</div>
+
+						</div>
+
+					</div>
+
+					<div class="mb-4">
+
+						<h6 class="fw-bold mb-2">
+							Old Values
+						</h6>
+
+						<div
+							id="auditOldValues"
+							class="audit-json"
+						></div>
+
+					</div>
+
+					<div>
+
+						<h6 class="fw-bold mb-2">
+							New Values
+						</h6>
+
+						<div
+							id="auditNewValues"
+							class="audit-json"
+						></div>
+
+					</div>
+
+				</div>
+
+				<div class="modal-footer">
+
+					<button
+						type="button"
+						class="btn btn-info fw-semibold"
+						data-bs-dismiss="modal"
+					>
+						Close
+					</button>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
 	<script>
 		const auditFetchUrl = '<?= site_url('audit/fetch'); ?>';
 	</script>
 
-	<script src="<?= base_url('application/assets/js/audit.js'); ?>"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script src="<?= base_url('application/assets/js/audit.js?v=2'); ?>"></script>
 
 </body>
 

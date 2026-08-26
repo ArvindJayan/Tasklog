@@ -170,7 +170,9 @@
 					</p>
 
 				</div>
-
+				<a href="<?= site_url('tasks'); ?>" class="btn btn-info fw-semibold">
+					Go to Tasks
+				</a>
 			</div>
 
 			<div id="alertContainer"></div>
@@ -235,33 +237,6 @@
 
 					</div>
 
-					<div class="col-md-4">
-
-						<a href="<?= site_url('admin/tasks'); ?>" class="text-decoration-none">
-
-							<div class="card bg-surface border-tasklog rounded-4 action-card h-100">
-
-								<div class="card-body p-4">
-
-									<div class="fs-2 text-success mb-3">
-										<i class="bi bi-list-task"></i>
-									</div>
-
-									<h4 class="fw-bold text-white">
-										Tasks
-									</h4>
-
-									<p class="text-secondary mb-0">
-										View and manage tasks across the organization.
-									</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-					</div>
 
 				</div>
 
@@ -388,7 +363,7 @@
 								</h4>
 
 								<p class="text-secondary mb-0">
-									Your recently assigned tasks.
+									Tasked assigned to you.
 								</p>
 
 							</div>
@@ -415,10 +390,7 @@
 									You don't have any tasks assigned to you.
 								</p>
 
-								<button
-									type="button"
-									class="btn btn-info fw-semibold"
-									data-bs-toggle="modal"
+								<button type="button" class="btn btn-info fw-semibold" data-bs-toggle="modal"
 									data-bs-target="#createTaskModal">
 
 									<i class="bi bi-plus-lg me-1"></i>
@@ -491,7 +463,8 @@
 													];
 													?>
 
-													<span class="badge <?= $priority_classes[$task->priority] ?? 'text-bg-secondary'; ?>">
+													<span
+														class="badge <?= $priority_classes[$task->priority] ?? 'text-bg-secondary'; ?>">
 														<?= ucfirst($task->priority); ?>
 													</span>
 
@@ -508,7 +481,8 @@
 													];
 													?>
 
-													<span class="badge <?= $status_classes[$task->status] ?? 'text-bg-secondary'; ?>">
+													<span
+														class="badge <?= $status_classes[$task->status] ?? 'text-bg-secondary'; ?>">
 														<?= ucwords(str_replace('_', ' ', $task->status)); ?>
 													</span>
 
@@ -538,13 +512,185 @@
 
 				</div>
 
+				<?php if ($role_id == 2): ?>
+
+					<div class="card bg-surface border-tasklog rounded-4 mt-4">
+
+						<div class="card-body p-4">
+
+							<div class="d-flex justify-content-between align-items-center mb-4">
+
+								<div>
+									<h4 class="fw-bold mb-1 text-white">
+										Tasks I've Assigned
+									</h4>
+
+									<p class="text-secondary mb-0">
+										Tasks assigned to employees under your supervision.
+									</p>
+								</div>
+
+								<a href="<?= site_url('tasks/assigned'); ?>" class="text-cyan text-decoration-none">
+									View All
+								</a>
+
+							</div>
+
+							<?php if (empty($assigned_tasks)): ?>
+
+								<div class="text-center py-5">
+
+									<div class="fs-1 text-muted mb-3">
+										<i class="bi bi-clipboard-x"></i>
+									</div>
+
+									<h5 class="fw-semibold text-white">
+										No assigned tasks
+									</h5>
+
+									<p class="text-secondary mb-0">
+										You haven't assigned any tasks to other employees.
+									</p>
+
+								</div>
+
+							<?php else: ?>
+
+								<div class="table-responsive rounded-3 overflow-hidden">
+
+									<table class="table table-dark table-borderless align-middle mb-0">
+
+										<thead>
+											<tr class="border-bottom border-tasklog">
+
+												<th class="px-4">
+													Task
+												</th>
+
+												<th class="px-4">
+													Assigned To
+												</th>
+
+												<th class="px-4">
+													Priority
+												</th>
+
+												<th class="px-4">
+													Status
+												</th>
+
+												<th class="px-4 text-nowrap">
+													Due Date
+												</th>
+
+											</tr>
+										</thead>
+
+										<tbody>
+
+											<?php foreach (array_slice($assigned_tasks, 0, 5) as $task): ?>
+
+												<tr class="task-row border-bottom border-tasklog">
+
+													<td class="px-4">
+
+														<div class="fw-semibold">
+															<?= html_escape($task->title); ?>
+														</div>
+
+														<?php if (!empty($task->description)): ?>
+
+															<small class="text-muted">
+																<?= html_escape($task->description); ?>
+															</small>
+
+														<?php endif; ?>
+
+													</td>
+
+													<td class="px-4">
+
+														<div class="fw-semibold">
+															<?= html_escape($task->assigned_to_name); ?>
+														</div>
+
+														<?php if (!empty($task->assigned_to_code)): ?>
+
+															<small class="text-muted">
+																<?= html_escape($task->assigned_to_code); ?>
+															</small>
+
+														<?php endif; ?>
+
+													</td>
+
+													<td class="px-4">
+
+														<?php
+														$priority_classes = [
+															'low' => 'text-bg-secondary',
+															'medium' => 'text-bg-info',
+															'high' => 'text-bg-warning',
+															'critical' => 'text-bg-danger'
+														];
+														?>
+
+														<span
+															class="badge <?= $priority_classes[$task->priority] ?? 'text-bg-secondary'; ?>">
+															<?= ucfirst($task->priority); ?>
+														</span>
+
+													</td>
+
+													<td class="px-4">
+
+														<?php
+														$status_classes = [
+															'pending' => 'text-bg-warning',
+															'in_progress' => 'text-bg-info',
+															'completed' => 'text-bg-success',
+															'cancelled' => 'text-bg-secondary'
+														];
+														?>
+
+														<span
+															class="badge <?= $status_classes[$task->status] ?? 'text-bg-secondary'; ?>">
+															<?= ucwords(str_replace('_', ' ', $task->status)); ?>
+														</span>
+
+													</td>
+
+													<td class="px-4 text-secondary text-nowrap">
+
+														<?= $task->due_date
+															? date('d M Y', strtotime($task->due_date))
+															: 'No due date'; ?>
+
+													</td>
+
+												</tr>
+
+											<?php endforeach; ?>
+
+										</tbody>
+
+									</table>
+
+								</div>
+
+							<?php endif; ?>
+
+						</div>
+
+					</div>
+
+				<?php endif; ?>
 			<?php endif; ?>
 
 		</div>
 
 	</main>
 
-	<!-- CREATE MODAL -->
 
 	<div class="modal fade" id="createTaskModal" tabindex="-1" aria-hidden="true">
 
@@ -572,12 +718,7 @@
 								Task Title
 							</label>
 
-							<input
-								type="text"
-								class="form-control"
-								name="title"
-								maxlength="200"
-								required>
+							<input type="text" class="form-control" name="title" maxlength="200" required>
 
 						</div>
 
@@ -587,10 +728,7 @@
 								Description
 							</label>
 
-							<textarea
-								class="form-control"
-								name="description"
-								rows="4"></textarea>
+							<textarea class="form-control" name="description" rows="4"></textarea>
 
 						</div>
 
@@ -600,10 +738,7 @@
 								Assign To
 							</label>
 
-							<select
-								class="form-select"
-								name="assigned_to"
-								required>
+							<select class="form-select" name="assigned_to" required>
 
 								<option value="">
 									Select employee
@@ -692,10 +827,7 @@
 									Due Date
 								</label>
 
-								<input
-									type="date"
-									class="form-control"
-									name="due_date">
+								<input type="date" class="form-control" name="due_date">
 
 							</div>
 
@@ -705,18 +837,13 @@
 
 					<div class="modal-footer border-tasklog">
 
-						<button
-							type="button"
-							class="btn btn-outline-light"
-							data-bs-dismiss="modal">
+						<button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
 
 							Cancel
 
 						</button>
 
-						<button
-							type="submit"
-							class="btn btn-info fw-semibold">
+						<button type="submit" class="btn btn-info fw-semibold">
 
 							Assign Task
 

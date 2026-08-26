@@ -12,6 +12,7 @@ class Admin extends MY_Controller
 		}
 
 		$this->load->model('Employee_model');
+		$this->load->model('Audit_model');
 	}
 
 	public function employees()
@@ -24,26 +25,51 @@ class Admin extends MY_Controller
 		$this->load->view('admin/employees', $data);
 	}
 
-	public function assign_ra()
+	public function update_employee()
 	{
 		if ($this->input->method() !== 'post') {
 			show_error('Invalid request.', 405);
 		}
 
 		$employee_id = (int) $this->input->post('employee_id');
+		$role_id = (int) $this->input->post('role_id');
 		$ra_id = (int) $this->input->post('ra_id');
 
-		if (!$employee_id || !$ra_id) {
-			$this->session->set_flashdata('error', 'Employee and RA are required.');
+		if (!$employee_id) {
+			$this->session->set_flashdata(
+				'error',
+				'Employee is required.'
+			);
+
 			redirect('admin/employees');
 		}
 
-		$admin_user_id = $this->session->userdata('user_id');
+		if (!in_array($role_id, [2, 3], true)) {
+			$this->session->set_flashdata(
+				'error',
+				'Invalid role selected.'
+			);
 
-		if ($this->Employee_model->assign_ra($employee_id, $ra_id, $admin_user_id)) {
-			$this->session->set_flashdata('success', 'RA assigned successfully.');
+			redirect('admin/employees');
+		}
+
+		$admin_user_id = (int) $this->session->userdata('user_id');
+
+		if ($this->Employee_model->update_employee_role(
+			$employee_id,
+			$role_id,
+			$ra_id ?: null,
+			$admin_user_id
+		)) {
+			$this->session->set_flashdata(
+				'success',
+				'Employee updated successfully.'
+			);
 		} else {
-			$this->session->set_flashdata('error', 'Unable to assign RA.');
+			$this->session->set_flashdata(
+				'error',
+				'Unable to update employee.'
+			);
 		}
 
 		redirect('admin/employees');
