@@ -170,9 +170,11 @@
 					</p>
 
 				</div>
-				<a href="<?= site_url('tasks'); ?>" class="btn btn-info fw-semibold">
-					Go to Tasks
-				</a>
+				<?php if ($role_id != 1): ?>
+					<a href="<?= site_url('tasks'); ?>" class="btn btn-info fw-semibold">
+						Go to Tasks
+					</a>
+				<?php endif; ?>
 			</div>
 
 			<div id="alertContainer"></div>
