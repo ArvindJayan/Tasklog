@@ -29,11 +29,37 @@ class Tasks extends Employee_Controller
 	public function assigned()
 	{
 		if ($this->session->userdata('role_id') != 2) {
-			show_error('You do not have permission to access this page.', 403);
+			redirect('dashboard');
 		}
 
-		$data['tasks'] = $this->Tasks_model
-			->get_tasks_assigned_by_employee_id($this->employee->id);
+		$user_id = $this->session->userdata('user_id');
+
+		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
+
+		if (!$employee) {
+			redirect('onboarding');
+		}
+
+		$data = [
+			'tasks' => $this->Tasks_model->get_tasks_assigned_by_employee_id(
+				$employee->id,
+				[
+					'search' => trim($this->input->get('search', true)),
+					'assigned_to' => $this->input->get('assigned_to', true),
+					'priority' => $this->input->get('priority', true),
+					'status' => $this->input->get('status', true),
+					'due_date' => $this->input->get('due_date', true)
+				]
+			),
+			'employees' => $this->Employee_model->get_employees_by_ra($employee->id),
+			'filters' => [
+				'search' => trim($this->input->get('search', true)),
+				'assigned_to' => $this->input->get('assigned_to', true),
+				'priority' => $this->input->get('priority', true),
+				'status' => $this->input->get('status', true),
+				'due_date' => $this->input->get('due_date', true)
+			]
+		];
 
 		$this->load->view('tasks/assigned', $data);
 	}

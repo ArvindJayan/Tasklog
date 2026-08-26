@@ -205,7 +205,99 @@
 			</div>
 
 			<div id="alertContainer"></div>
+			<form method="get" class="card bg-surface border-tasklog rounded-4 mb-4">
+				<div class="card-body p-4">
 
+					<h5 class="fw-bold text-white mb-3">
+						<i class="bi bi-funnel me-2 text-cyan"></i>
+						Filter Tasks
+					</h5>
+
+					<div class="row g-3">
+						<div class="col-md-3">
+							<label class="form-label text-secondary">
+								Assigned To
+							</label>
+
+							<select name="assigned_to" class="form-select">
+								<option value="">All</option>
+
+								<?php foreach ($employees as $assigned_employee): ?>
+									<option value="<?= $assigned_employee->id; ?>" <?= (string) ($filters['assigned_to'] ?? '') === (string) $assigned_employee->id ? 'selected' : ''; ?>>
+										<?= html_escape($assigned_employee->name); ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+						</div>
+
+						<div class="col-md-3">
+							<label class="form-label text-secondary">
+								Priority
+							</label>
+
+							<select name="priority" class="form-select">
+								<option value="">All</option>
+								<option value="low" <?= ($filters['priority'] ?? '') === 'low' ? 'selected' : ''; ?>>
+									Low
+								</option>
+								<option value="medium" <?= ($filters['priority'] ?? '') === 'medium' ? 'selected' : ''; ?>>
+									Medium
+								</option>
+								<option value="high" <?= ($filters['priority'] ?? '') === 'high' ? 'selected' : ''; ?>>
+									High
+								</option>
+								<option value="critical" <?= ($filters['priority'] ?? '') === 'critical' ? 'selected' : ''; ?>>
+									Critical
+								</option>
+							</select>
+						</div>
+
+						<div class="col-md-3">
+							<label class="form-label text-secondary">
+								Status
+							</label>
+
+							<select name="status" class="form-select">
+								<option value="">All</option>
+								<option value="pending" <?= ($filters['status'] ?? '') === 'pending' ? 'selected' : ''; ?>>
+									Pending
+								</option>
+								<option value="in_progress" <?= ($filters['status'] ?? '') === 'in_progress' ? 'selected' : ''; ?>>
+									In Progress
+								</option>
+								<option value="completed" <?= ($filters['status'] ?? '') === 'completed' ? 'selected' : ''; ?>>
+									Completed
+								</option>
+								<option value="cancelled" <?= ($filters['status'] ?? '') === 'cancelled' ? 'selected' : ''; ?>>
+									Cancelled
+								</option>
+							</select>
+						</div>
+
+						<div class="col-md-3">
+							<label class="form-label text-secondary">
+								Due Date
+							</label>
+
+							<input type="date" name="due_date" class="form-control"
+								value="<?= html_escape($filters['due_date'] ?? ''); ?>">
+						</div>
+					</div>
+
+					<div class="d-flex justify-content-end gap-2 mt-3">
+						<button type="submit" class="btn btn-info fw-semibold">
+							<i class="bi bi-search me-1"></i>
+							Search
+						</button>
+
+						<a href="<?= site_url('tasks/assigned'); ?>" class="btn btn-outline-info fw-semibold">
+							<i class="bi bi-x-lg me-1"></i>
+							Clear
+						</a>
+					</div>
+
+				</div>
+			</form>
 			<div class="card bg-surface border-tasklog rounded-4">
 
 				<div class="card-body p-4">
@@ -460,6 +552,38 @@
 
 					<div class="modal-body">
 
+						<?php if ($this->session->userdata('role_id') == 2): ?>
+
+							<div class="mb-3">
+
+								<label class="form-label text-secondary">
+									Assign To
+								</label>
+
+								<select class="form-select" name="assigned_to" required>
+									<option value="<?= $this->Employee_model
+										->get_employee_by_user_id($this->session->userdata('user_id'))->id; ?>">
+										Myself
+									</option>
+
+									<?php foreach ($this->Employee_model->get_employees_by_ra(
+										$this->Employee_model
+											->get_employee_by_user_id($this->session->userdata('user_id'))->id
+									) as $assigned_employee): ?>
+
+										<option value="<?= $assigned_employee->id; ?>">
+											<?= html_escape($assigned_employee->name); ?>
+											(<?= html_escape($assigned_employee->employee_code); ?>)
+										</option>
+
+									<?php endforeach; ?>
+
+								</select>
+
+							</div>
+
+						<?php endif; ?>
+
 						<div class="mb-3">
 
 							<label class="form-label text-secondary">
@@ -474,51 +598,16 @@
 
 							<label class="form-label text-secondary">
 								Description
+								<span class="text-muted">(Optional)</span>
 							</label>
 
 							<textarea class="form-control" name="description" rows="4"></textarea>
 
 						</div>
 
-						<div class="mb-3">
-
-							<label class="form-label text-secondary">
-								Assign To
-							</label>
-
-							<select class="form-select" name="assigned_to" required>
-
-								<option value="">
-									Select employee
-								</option>
-
-								<?php if (!empty($employees)): ?>
-
-									<?php foreach ($employees as $employee): ?>
-
-										<option value="<?= $employee->id; ?>">
-
-											<?= html_escape($employee->name); ?>
-
-											<?php if (!empty($employee->employee_code)): ?>
-
-												(<?= html_escape($employee->employee_code); ?>)
-
-											<?php endif; ?>
-
-										</option>
-
-									<?php endforeach; ?>
-
-								<?php endif; ?>
-
-							</select>
-
-						</div>
-
 						<div class="row g-3">
 
-							<div class="col-md-4">
+							<div class="col-md-6">
 
 								<label class="form-label text-secondary">
 									Priority
@@ -546,41 +635,13 @@
 
 							</div>
 
-							<div class="col-md-4">
-
-								<label class="form-label text-secondary">
-									Status
-								</label>
-
-								<select class="form-select" name="status">
-
-									<option value="pending" selected>
-										Pending
-									</option>
-
-									<option value="in_progress">
-										In Progress
-									</option>
-
-									<option value="completed">
-										Completed
-									</option>
-
-									<option value="cancelled">
-										Cancelled
-									</option>
-
-								</select>
-
-							</div>
-
-							<div class="col-md-4">
+							<div class="col-md-6">
 
 								<label class="form-label text-secondary">
 									Due Date
 								</label>
 
-								<input type="date" class="form-control" name="due_date">
+								<input type="date" class="form-control" name="due_date" required>
 
 							</div>
 
@@ -590,29 +651,24 @@
 
 					<div class="modal-footer border-tasklog">
 
-						<button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
-
+						<button type="button" class="btn btn-outline-info fw-semibold" data-bs-dismiss="modal">
 							Cancel
-
 						</button>
 
 						<button type="submit" class="btn btn-info fw-semibold">
-
-							Assign Task
-
+							Create Task
 						</button>
 
 					</div>
 
 				</form>
 
+
 			</div>
 
 		</div>
 
 	</div>
-
-	<!-- VIEW MODAL -->
 
 	<div class="modal fade" id="viewTaskModal" tabindex="-1" aria-hidden="true">
 

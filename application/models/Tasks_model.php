@@ -104,9 +104,9 @@ class Tasks_model extends CI_Model
 		);
 	}
 
-	public function get_tasks_assigned_by_employee_id($employee_id)
+	public function get_tasks_assigned_by_employee_id($employee_id, $filters = [])
 	{
-		return $this->db
+		$this->db
 			->select('
 			tasks.*,
 			assigned_to_employee.employee_code AS assigned_to_code,
@@ -131,7 +131,36 @@ class Tasks_model extends CI_Model
 				'users AS assigned_by_user',
 				'assigned_by_user.id = assigned_by_employee.user_id'
 			)
-			->where('tasks.assigned_by', $employee_id)
+			->where('tasks.assigned_by', $employee_id);
+
+		if (!empty($filters['search'])) {
+			$this->db
+				->group_start()
+				->like('tasks.title', $filters['search'])
+				->or_like('tasks.description', $filters['search'])
+				->group_end();
+		}
+
+		if (!empty($filters['assigned_to'])) {
+			$this->db->where(
+				'tasks.assigned_to',
+				(int) $filters['assigned_to']
+			);
+		}
+
+		if (!empty($filters['priority'])) {
+			$this->db->where('tasks.priority', $filters['priority']);
+		}
+
+		if (!empty($filters['status'])) {
+			$this->db->where('tasks.status', $filters['status']);
+		}
+
+		if (!empty($filters['due_date'])) {
+			$this->db->where('tasks.due_date', $filters['due_date']);
+		}
+
+		return $this->db
 			->order_by('tasks.created_at', 'DESC')
 			->get()
 			->result();
