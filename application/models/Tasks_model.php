@@ -29,15 +29,6 @@ class Tasks_model extends CI_Model
 		return $this->db->insert('tasks', $task_data);
 	}
 
-	public function get_tasks_by_user_id($user_id)
-	{
-		return $this->db
-			->where('assigned_to', $user_id)
-			->order_by('created_at', 'DESC')
-			->get('tasks')
-			->result();
-	}
-
 	public function get_tasks_by_employee_id($employee_id)
 	{
 		return $this->db
@@ -45,5 +36,13 @@ class Tasks_model extends CI_Model
 			->order_by('created_at', 'DESC')
 			->get('tasks')
 			->result();
+	}
+
+	public function employee_belongs_to_ra($employee_id, $ra_id)
+	{
+		return $this->db
+			->where('id', $employee_id)
+			->where('ra_id', $ra_id)
+			->count_all_results('employees') > 0;
 	}
 }

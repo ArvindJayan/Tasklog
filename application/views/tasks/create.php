@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>TaskLog</title>
+    <title>TaskLog</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+
     <style>
         :root {
             --tasklog-bg: #0b1120;
@@ -81,6 +83,7 @@
 
     <nav class="navbar navbar-dark border-bottom border-tasklog">
         <div class="container py-2">
+
             <a class="navbar-brand fw-bold fs-3" href="<?= site_url('dashboard'); ?>">
                 Task<span class="text-cyan">Log</span>
             </a>
@@ -94,13 +97,14 @@
                     Logout
                 </a>
             </div>
+
         </div>
     </nav>
 
     <main>
         <div class="container py-5">
 
-            <div class=" d-flex justify-content-end mb-4">
+            <div class="d-flex justify-content-end mb-4">
                 <a href="<?= site_url('dashboard'); ?>" class="btn btn-info fw-semibold">
                     Back to Dashboard
                 </a>
@@ -113,7 +117,10 @@
                         <div class="card-body p-4 p-md-5">
 
                             <div class="mb-4">
-                                <h2 class="fw-bold mb-1 text-secondary">Create Task</h2>
+                                <h2 class="fw-bold mb-1 text-secondary">
+                                    Create Task
+                                </h2>
+
                                 <p class="text-secondary mb-0">
                                     Create a task and add it to your task list.
                                 </p>
@@ -126,8 +133,44 @@
                                 </div>
                             <?php endif; ?>
 
+                            <?php if ($this->session->flashdata('success')): ?>
+                                <div class="alert alert-success" role="alert">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    <?= html_escape($this->session->flashdata('success')); ?>
+                                </div>
+                            <?php endif; ?>
+
                             <form id="createTaskForm" action="<?= site_url('tasks/create'); ?>" method="POST"
                                 novalidate>
+
+                                <?php if ($role_id == 2): ?>
+
+                                    <div class="mb-3">
+                                        <label for="assigned_to" class="form-label text-secondary">
+                                            Assign To
+                                        </label>
+
+                                        <select class="form-select" id="assigned_to" name="assigned_to" required>
+                                            <option value="<?= $employee->id; ?>">
+                                                Myself
+                                            </option>
+                                            <?php foreach ($employees as $assigned_employee): ?>
+
+                                                <option value="<?= $assigned_employee->id; ?>">
+                                                    <?= html_escape($assigned_employee->name); ?>
+                                                    (<?= html_escape($assigned_employee->employee_code); ?>)
+                                                </option>
+
+                                            <?php endforeach; ?>
+
+                                        </select>
+
+                                        <div class="invalid-feedback">
+                                            Please select an employee.
+                                        </div>
+                                    </div>
+
+                                <?php endif; ?>
 
                                 <div class="mb-3">
                                     <label for="title" class="form-label text-secondary">
@@ -144,7 +187,7 @@
 
                                 <div class="mb-3">
                                     <label for="description" class="form-label text-secondary">
-                                        Description 
+                                        Description
                                         <span class="text-secondary">(Optional)</span>
                                     </label>
 
@@ -153,6 +196,7 @@
                                 </div>
 
                                 <div class="row g-3 mb-4">
+
                                     <div class="col-md-6">
                                         <label for="priority" class="form-label text-secondary">
                                             Priority
@@ -166,17 +210,19 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-md-6 text-secondary">
-                                        <label for="due_date" class="form-label">
+                                    <div class="col-md-6">
+                                        <label for="due_date" class="form-label text-secondary">
                                             Due Date
                                             <span class="text-secondary">(Optional)</span>
                                         </label>
 
                                         <input type="date" class="form-control" id="due_date" name="due_date">
                                     </div>
+
                                 </div>
 
                                 <div class="d-flex justify-content-end gap-2">
+
                                     <a href="<?= site_url('dashboard'); ?>" class="btn btn-outline-light">
                                         Cancel
                                     </a>
@@ -185,6 +231,7 @@
                                         <i class="bi bi-plus-lg me-1"></i>
                                         Create Task
                                     </button>
+
                                 </div>
 
                             </form>
@@ -200,6 +247,7 @@
 
     <script src="<?= base_url('assets/js/utils.js'); ?>"></script>
     <script src="<?= base_url('assets/js/task.js'); ?>"></script>
+
 </body>
 
 </html>
