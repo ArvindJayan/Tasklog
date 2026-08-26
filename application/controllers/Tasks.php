@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Tasks extends CI_Controller
+class Tasks extends Employee_Controller
 {
 	public function __construct()
 	{

@@ -13,9 +13,27 @@ class MY_Controller extends CI_Controller
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
 		}
+	}
+}
 
-		if (!$this->Employee_model->get_employee_by_user_id($this->session->userdata('user_id'))) {
+class Employee_Controller extends MY_Controller
+{	
+	protected $employee;
+
+	public function __construct()
+	{
+		parent::__construct();
+
+		$this->load->model('Employee_model');
+
+		$employee = $this->Employee_model->get_employee_by_user_id(
+			$this->session->userdata('user_id')
+		);
+
+		if (!$employee) {
 			redirect('onboarding');
 		}
+
+		$this->employee = $employee;
 	}
 }
