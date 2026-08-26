@@ -1,17 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Onboarding extends CI_Controller
+class Onboarding extends MY_Controller
 {
 	public function __construct()
 	{
 		parent::__construct();
 		$this->load->model('Employee_model');
-		$this->load->library('session');
-
-		if (!$this->session->userdata('logged_in')) {
-			redirect('auth/login');
-		}
 	}
 
 	public function index()

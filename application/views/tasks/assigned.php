@@ -194,10 +194,7 @@
 
 				</div>
 
-				<button
-					type="button"
-					class="btn btn-info fw-semibold"
-					data-bs-toggle="modal"
+				<button type="button" class="btn btn-info fw-semibold" data-bs-toggle="modal"
 					data-bs-target="#createTaskModal">
 
 					<i class="bi bi-plus-lg me-1"></i>
@@ -251,10 +248,7 @@
 								You haven't assigned any tasks yet.
 							</p>
 
-							<button
-								type="button"
-								class="btn btn-info fw-semibold"
-								data-bs-toggle="modal"
+							<button type="button" class="btn btn-info fw-semibold" data-bs-toggle="modal"
 								data-bs-target="#createTaskModal">
 
 								<i class="bi bi-plus-lg me-1"></i>
@@ -266,7 +260,7 @@
 
 					<?php else: ?>
 
-						<div class="table-responsive rounded-2">
+						<div>
 
 							<table class="table table-dark table-borderless align-middle mb-0">
 
@@ -304,19 +298,17 @@
 
 									<?php foreach ($tasks as $task): ?>
 
-										<tr
-											class="task-row border-bottom border-tasklog"
-											id="task-row-<?= $task->id; ?>">
+										<tr class="task-row border-bottom border-tasklog" id="task-row-<?= $task->id; ?>">
 
-											<td class="px-4 py-3">
+											<td class="px-4 py-3 task-title-cell">
 
-												<div class="fw-semibold text-white">
+												<div class="fw-semibold text-white task-title">
 													<?= html_escape($task->title); ?>
 												</div>
 
 												<?php if (!empty($task->description)): ?>
 
-													<small class="text-muted">
+													<small class="text-muted task-description">
 														<?= html_escape($task->description); ?>
 													</small>
 
@@ -327,11 +319,7 @@
 											<td class="px-4 py-3">
 
 												<div class="fw-semibold text-white">
-
-													<?= html_escape(
-														$task->assigned_to_name ?? 'Unknown'
-													); ?>
-
+													<?= html_escape($task->assigned_to_name ?? 'Unknown'); ?>
 												</div>
 
 												<?php if (!empty($task->assigned_to_code)): ?>
@@ -344,7 +332,7 @@
 
 											</td>
 
-											<td class="px-4 py-3">
+											<td class="px-4 py-3 task-priority-cell">
 
 												<?php
 												$priority_classes = [
@@ -355,13 +343,14 @@
 												];
 												?>
 
-												<span class="badge <?= $priority_classes[$task->priority] ?? 'text-bg-secondary'; ?>">
+												<span
+													class="badge <?= $priority_classes[$task->priority] ?? 'text-bg-secondary'; ?>">
 													<?= ucfirst($task->priority); ?>
 												</span>
 
 											</td>
 
-											<td class="px-4 py-3">
+											<td class="px-4 py-3 task-status-cell">
 
 												<?php
 												$status_classes = [
@@ -372,79 +361,54 @@
 												];
 												?>
 
-												<span class="badge <?= $status_classes[$task->status] ?? 'text-bg-secondary'; ?>">
+												<span
+													class="badge <?= $status_classes[$task->status] ?? 'text-bg-secondary'; ?>">
 													<?= ucwords(str_replace('_', ' ', $task->status)); ?>
 												</span>
 
 											</td>
 
-											<td class="px-4 py-3 text-secondary text-nowrap">
-
+											<td class="px-4 py-3 text-secondary text-nowrap task-due-date">
 												<?= $task->due_date
 													? date('d M Y', strtotime($task->due_date))
 													: 'No due date'; ?>
-
 											</td>
 
 											<td class="px-4 py-3 text-end">
 
 												<div class="dropdown">
 
-													<button
-														class="btn btn-menu"
-														type="button"
-														data-bs-toggle="dropdown"
+													<button class="btn btn-menu" type="button" data-bs-toggle="dropdown"
 														aria-expanded="false">
-
 														<i class="bi bi-three-dots-vertical fs-5"></i>
-
 													</button>
 
 													<ul class="dropdown-menu dropdown-menu-end">
 
 														<li>
-
-															<button
-																type="button"
-																class="dropdown-item view-task-btn"
+															<button type="button" class="dropdown-item view-task-btn"
 																data-task-id="<?= $task->id; ?>">
-
 																View
-
 															</button>
-
 														</li>
 
 														<li>
-
-															<button
-																type="button"
-																class="dropdown-item edit-task-btn"
+															<button type="button" class="dropdown-item edit-task-btn"
 																data-task-id="<?= $task->id; ?>">
-
 																Edit
-
 															</button>
-
 														</li>
 
 														<li>
-
 															<hr class="dropdown-divider border-tasklog">
-
 														</li>
 
 														<li>
-
-															<button
-																type="button"
+															<button type="button"
 																class="dropdown-item text-danger delete-task-btn"
 																data-task-id="<?= $task->id; ?>">
-
 																Delete
-
 															</button>
-
 														</li>
 
 													</ul>
@@ -487,10 +451,7 @@
 						Assign Task
 					</h5>
 
-					<button
-						type="button"
-						class="btn-close btn-close-white"
-						data-bs-dismiss="modal">
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
 					</button>
 
 				</div>
@@ -505,12 +466,7 @@
 								Task Title
 							</label>
 
-							<input
-								type="text"
-								class="form-control"
-								name="title"
-								maxlength="200"
-								required>
+							<input type="text" class="form-control" name="title" maxlength="200" required>
 
 						</div>
 
@@ -520,10 +476,7 @@
 								Description
 							</label>
 
-							<textarea
-								class="form-control"
-								name="description"
-								rows="4"></textarea>
+							<textarea class="form-control" name="description" rows="4"></textarea>
 
 						</div>
 
@@ -533,10 +486,7 @@
 								Assign To
 							</label>
 
-							<select
-								class="form-select"
-								name="assigned_to"
-								required>
+							<select class="form-select" name="assigned_to" required>
 
 								<option value="">
 									Select employee
@@ -630,10 +580,7 @@
 									Due Date
 								</label>
 
-								<input
-									type="date"
-									class="form-control"
-									name="due_date">
+								<input type="date" class="form-control" name="due_date">
 
 							</div>
 
@@ -643,18 +590,13 @@
 
 					<div class="modal-footer border-tasklog">
 
-						<button
-							type="button"
-							class="btn btn-outline-light"
-							data-bs-dismiss="modal">
+						<button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
 
 							Cancel
 
 						</button>
 
-						<button
-							type="submit"
-							class="btn btn-info fw-semibold">
+						<button type="submit" class="btn btn-info fw-semibold">
 
 							Assign Task
 
@@ -684,10 +626,7 @@
 						Task Details
 					</h5>
 
-					<button
-						type="button"
-						class="btn-close btn-close-white"
-						data-bs-dismiss="modal">
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
 					</button>
 
 				</div>
@@ -820,10 +759,7 @@
 
 				<div class="modal-footer border-tasklog">
 
-					<button
-						type="button"
-						class="btn btn-outline-light"
-						data-bs-dismiss="modal">
+					<button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
 
 						Close
 
@@ -851,20 +787,14 @@
 						Edit Task
 					</h5>
 
-					<button
-						type="button"
-						class="btn-close btn-close-white"
-						data-bs-dismiss="modal">
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
 					</button>
 
 				</div>
 
 				<form id="editTaskForm">
 
-					<input
-						type="hidden"
-						name="task_id"
-						id="editTaskId">
+					<input type="hidden" name="task_id" id="editTaskId">
 
 					<div class="modal-body">
 
@@ -874,12 +804,7 @@
 								Task Title
 							</label>
 
-							<input
-								type="text"
-								class="form-control"
-								name="title"
-								id="editTitle"
-								maxlength="200"
+							<input type="text" class="form-control" name="title" id="editTitle" maxlength="200"
 								required>
 
 						</div>
@@ -890,11 +815,7 @@
 								Description
 							</label>
 
-							<textarea
-								class="form-control"
-								name="description"
-								id="editDescription"
-								rows="4"></textarea>
+							<textarea class="form-control" name="description" id="editDescription" rows="4"></textarea>
 
 						</div>
 
@@ -906,10 +827,7 @@
 									Priority
 								</label>
 
-								<select
-									class="form-select"
-									name="priority"
-									id="editPriority">
+								<select class="form-select" name="priority" id="editPriority">
 
 									<option value="low">
 										Low
@@ -937,10 +855,7 @@
 									Status
 								</label>
 
-								<select
-									class="form-select"
-									name="status"
-									id="editStatus">
+								<select class="form-select" name="status" id="editStatus">
 
 									<option value="pending">
 										Pending
@@ -968,11 +883,7 @@
 									Due Date
 								</label>
 
-								<input
-									type="date"
-									class="form-control"
-									name="due_date"
-									id="editDueDate">
+								<input type="date" class="form-control" name="due_date" id="editDueDate">
 
 							</div>
 
@@ -982,18 +893,13 @@
 
 					<div class="modal-footer border-tasklog">
 
-						<button
-							type="button"
-							class="btn btn-outline-info fw-semibold"
-							data-bs-dismiss="modal">
+						<button type="button" class="btn btn-outline-info fw-semibold" data-bs-dismiss="modal">
 
 							Cancel
 
 						</button>
 
-						<button
-							type="submit"
-							class="btn btn-info fw-semibold">
+						<button type="submit" class="btn btn-info fw-semibold">
 
 							Save Changes
 
@@ -1023,10 +929,7 @@
 						Delete Task
 					</h5>
 
-					<button
-						type="button"
-						class="btn-close btn-close-white"
-						data-bs-dismiss="modal">
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
 					</button>
 
 				</div>
@@ -1042,19 +945,13 @@
 
 				<div class="modal-footer border-tasklog">
 
-					<button
-						type="button"
-						class="btn btn-outline-info fw-semibold"
-						data-bs-dismiss="modal">
+					<button type="button" class="btn btn-outline-info fw-semibold" data-bs-dismiss="modal">
 
 						Cancel
 
 					</button>
 
-					<button
-						type="button"
-						class="btn btn-danger"
-						id="confirmDeleteBtn">
+					<button type="button" class="btn btn-danger" id="confirmDeleteBtn">
 
 						Delete Task
 

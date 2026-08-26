@@ -24,16 +24,18 @@ class Employee_Controller extends MY_Controller
 	{
 		parent::__construct();
 
+		$this->load->model('Tasks_model');
 		$this->load->model('Employee_model');
 
-		$employee = $this->Employee_model->get_employee_by_user_id(
-			$this->session->userdata('user_id')
-		);
+		$role_id = $this->session->userdata('role_id');
+		if ($role_id != 1) {
+			$employee = $this->Employee_model->get_employee_by_user_id(
+				$this->session->userdata('user_id')
+			);
 
-		if (!$employee) {
-			redirect('onboarding');
+			if (!$employee) {
+				redirect('onboarding');
+			}
 		}
-
-		$this->employee = $employee;
 	}
 }

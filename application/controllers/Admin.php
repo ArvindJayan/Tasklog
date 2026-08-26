@@ -8,7 +8,7 @@ class Admin extends MY_Controller
 		parent::__construct();
 
 		if ((int) $this->session->userdata('role_id') !== 1) {
-			show_error('Access denied.', 403);
+			redirect('dashboard');
 		}
 
 		$this->load->model('Employee_model');

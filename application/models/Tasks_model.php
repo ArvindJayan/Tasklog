@@ -86,7 +86,10 @@ class Tasks_model extends CI_Model
 			return false;
 		}
 
-		return (int) $task->assigned_to === (int) $employee_id;
+		return (
+			(int) $task->assigned_to === (int) $employee_id ||
+			(int) $task->assigned_by === (int) $employee_id
+		);
 	}
 
 	public function can_delete_task($task, $employee_id)
@@ -95,7 +98,10 @@ class Tasks_model extends CI_Model
 			return false;
 		}
 
-		return (int) $task->assigned_to === (int) $employee_id;
+		return (
+			(int) $task->assigned_to === (int) $employee_id ||
+			(int) $task->assigned_by === (int) $employee_id
+		);
 	}
 
 	public function get_tasks_assigned_by_employee_id($employee_id)

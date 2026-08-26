@@ -144,10 +144,7 @@ if (createTaskForm) {
 			})
 			.catch((error) => {
 				console.error("Create error:", error);
-				showAlert(
-					error.message || "Unable to create task.",
-					"danger",
-				);
+				showAlert(error.message || "Unable to create task.", "danger");
 			})
 			.finally(() => {
 				submitButton.disabled = false;
@@ -188,8 +185,7 @@ document.querySelectorAll(".view-task-btn").forEach((button) => {
 
 				const task = data.task;
 
-				document.getElementById("viewTaskTitle").textContent =
-					task.title || "";
+				document.getElementById("viewTaskTitle").textContent = task.title || "";
 
 				document.getElementById("viewTaskDescription").textContent =
 					task.description || "No description provided.";
@@ -197,27 +193,25 @@ document.querySelectorAll(".view-task-btn").forEach((button) => {
 				document.getElementById("viewTaskPriority").innerHTML =
 					getPriorityBadge(task.priority);
 
-				document.getElementById("viewTaskStatus").innerHTML =
-					getStatusBadge(task.status);
+				document.getElementById("viewTaskStatus").innerHTML = getStatusBadge(
+					task.status,
+				);
 
-				document.getElementById("viewTaskDueDate").textContent =
-					formatDate(task.due_date);
+				document.getElementById("viewTaskDueDate").textContent = formatDate(
+					task.due_date,
+				);
 
 				document.getElementById("viewTaskAssignedTo").textContent =
 					task.assigned_to_name
 						? `${task.assigned_to_name}${
-								task.assigned_to_code
-									? ` (${task.assigned_to_code})`
-									: ""
+								task.assigned_to_code ? ` (${task.assigned_to_code})` : ""
 							}`
 						: "Not assigned";
 
 				document.getElementById("viewTaskAssignedBy").textContent =
 					task.assigned_by_name
 						? `${task.assigned_by_name}${
-								task.assigned_by_code
-									? ` (${task.assigned_by_code})`
-									: ""
+								task.assigned_by_code ? ` (${task.assigned_by_code})` : ""
 							}`
 						: "Self-created";
 
@@ -233,8 +227,7 @@ document.querySelectorAll(".view-task-btn").forEach((button) => {
 				loading.classList.add("d-none");
 
 				errorElement.textContent =
-					error.message ||
-					"Unable to load task. Please try again.";
+					error.message || "Unable to load task. Please try again.";
 
 				errorElement.classList.remove("d-none");
 			});
@@ -263,12 +256,9 @@ document.querySelectorAll(".edit-task-btn").forEach((button) => {
 				document.getElementById("editTitle").value = task.title || "";
 				document.getElementById("editDescription").value =
 					task.description || "";
-				document.getElementById("editPriority").value =
-					task.priority;
-				document.getElementById("editStatus").value =
-					task.status;
-				document.getElementById("editDueDate").value =
-					task.due_date || "";
+				document.getElementById("editPriority").value = task.priority;
+				document.getElementById("editStatus").value = task.status;
+				document.getElementById("editDueDate").value = task.due_date || "";
 
 				if (editModal) {
 					editModal.show();
@@ -277,10 +267,7 @@ document.querySelectorAll(".edit-task-btn").forEach((button) => {
 			.catch((error) => {
 				console.error("Load edit error:", error);
 
-				showAlert(
-					error.message || "Unable to load task.",
-					"danger",
-				);
+				showAlert(error.message || "Unable to load task.", "danger");
 			});
 	});
 });
@@ -292,11 +279,9 @@ if (editTaskForm) {
 		event.preventDefault();
 
 		const form = this;
-		const taskId =
-			document.getElementById("editTaskId").value;
+		const taskId = document.getElementById("editTaskId").value;
 
-		const submitButton =
-			form.querySelector('button[type="submit"]');
+		const submitButton = form.querySelector('button[type="submit"]');
 
 		submitButton.disabled = true;
 
@@ -318,31 +303,23 @@ if (editTaskForm) {
 					editModal.hide();
 				}
 
-				const row = document.getElementById(
-					"task-row-" + taskId,
-				);
+				const row = document.getElementById("task-row-" + taskId);
 
 				if (row) {
 					const cells = row.querySelectorAll("td");
 
-					cells[0].querySelector(
-						".fw-semibold",
-					).textContent = form.title.value;
+					cells[0].querySelector(".fw-semibold").textContent = form.title.value;
 
-					const description =
-						cells[0].querySelector("small");
+					const description = cells[0].querySelector("small");
 
 					if (form.description.value.trim()) {
 						if (description) {
-							description.textContent =
-								form.description.value;
+							description.textContent = form.description.value;
 						} else {
-							const small =
-								document.createElement("small");
+							const small = document.createElement("small");
 
 							small.className = "text-muted";
-							small.textContent =
-								form.description.value;
+							small.textContent = form.description.value;
 
 							cells[0].appendChild(small);
 						}
@@ -350,21 +327,9 @@ if (editTaskForm) {
 						description.remove();
 					}
 
-					cells[2].querySelector(
-						".badge",
-					).outerHTML = getPriorityBadge(
-						form.priority.value,
-					);
-
-					cells[3].querySelector(
-						".badge",
-					).outerHTML = getStatusBadge(
-						form.status.value,
-					);
-
-					cells[4].textContent = formatDate(
-						form.due_date.value,
-					);
+					cells[2].innerHTML = getPriorityBadge(form.priority.value);
+					cells[3].innerHTML = getStatusBadge(form.status.value);
+					cells[4].textContent = formatDate(form.due_date.value);
 				}
 
 				showAlert(data.message);
@@ -372,11 +337,7 @@ if (editTaskForm) {
 			.catch((error) => {
 				console.error("Edit error:", error);
 
-				showAlert(
-					error.message ||
-						"Unable to update task.",
-					"danger",
-				);
+				showAlert(error.message || "Unable to update task.", "danger");
 			})
 			.finally(() => {
 				submitButton.disabled = false;
@@ -394,8 +355,7 @@ document.querySelectorAll(".delete-task-btn").forEach((button) => {
 	});
 });
 
-const confirmDeleteButton =
-	document.getElementById("confirmDeleteBtn");
+const confirmDeleteButton = document.getElementById("confirmDeleteBtn");
 
 if (confirmDeleteButton) {
 	confirmDeleteButton.addEventListener("click", function () {
@@ -425,20 +385,14 @@ if (confirmDeleteButton) {
 					deleteModal.hide();
 				}
 
-				document
-					.getElementById("task-row-" + taskId)
-					?.remove();
+				document.getElementById("task-row-" + taskId)?.remove();
 
 				showAlert(data.message);
 			})
 			.catch((error) => {
 				console.error("Delete error:", error);
 
-				showAlert(
-					error.message ||
-						"Unable to delete task.",
-					"danger",
-				);
+				showAlert(error.message || "Unable to delete task.", "danger");
 			})
 			.finally(() => {
 				button.disabled = false;
