@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Employees - TaskLog</title>
+    <title>TaskLog</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -140,7 +140,7 @@
                     </p>
                 </div>
 
-                <a href="<?= site_url('dashboard'); ?>" class="btn btn-outline-light">
+                <a href="<?= site_url('dashboard'); ?>" class="btn btn-outline-info fw-semibold">
                     Back to Dashboard
                 </a>
 
@@ -220,7 +220,7 @@
                                         </th>
 
                                         <th class="px-4 py-3 text-nowrap">
-                                            Reporting RA
+                                            Reporting Authority
                                         </th>
 
                                         <th class="px-4 py-3 text-nowrap text-end">
@@ -286,12 +286,11 @@
 
                                             <td class="px-4 py-3 text-end">
 
-                                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
+                                                <button type="button" class="btn btn-sm btn-info fw-semibold" data-bs-toggle="modal"
                                                     data-bs-target="#assignRaModal" data-employee-id="<?= $employee->id; ?>"
                                                     data-employee-name="<?= html_escape($employee->name); ?>"
                                                     data-current-ra="<?= !empty($employee->ra_id) ? $employee->ra_id : ''; ?>">
-                                                    <i class="bi bi-person-gear me-1"></i>
-                                                    Assign RA
+                                                    Edit
                                                 </button>
 
                                             </td>
@@ -327,7 +326,7 @@
 
                         <div>
                             <h5 class="modal-title fw-bold" id="assignRaModalLabel">
-                                Assign RA
+                                Edit Employee
                             </h5>
 
                             <small class="text-secondary" id="employeeName">
@@ -351,7 +350,7 @@
                             <select class="form-select" name="ra_id" id="ra_id" required>
 
                                 <option value="">
-                                    Select RA
+                                    Select
                                 </option>
 
                                 <?php foreach ($ras as $ra): ?>
@@ -370,7 +369,7 @@
                             </select>
 
                             <div class="invalid-feedback">
-                                Please select an RA.
+                                Please select an RA. 
                             </div>
 
                         </div>
@@ -384,8 +383,7 @@
                         </button>
 
                         <button type="submit" class="btn btn-info fw-semibold">
-                            <i class="bi bi-check-lg me-1"></i>
-                            Save Assignment
+                            Save
                         </button>
 
                     </div>

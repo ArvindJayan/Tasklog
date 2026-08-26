@@ -17,7 +17,7 @@ class Admin extends MY_Controller
 	public function employees()
 	{
 		$data = [
-			'employees' => $this->Employee_model->get_all_employees_with_ra(),
+			'employees' => $this->Employee_model->get_all_employees(),
 			'ras' => $this->Employee_model->get_all_ras()
 		];
 

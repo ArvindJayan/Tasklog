@@ -21,6 +21,25 @@ class Employee_model extends CI_Model
 
 		return $this->db->insert('employees', $data);
 	}
+	public function get_employees_by_ra($ra_id)
+	{
+		return $this->db
+			->select('
+			employees.id,
+			employees.employee_code,
+			employees.department,
+			employees.designation,
+			users.name,
+			users.email
+		')
+			->from('employees')
+			->join('users', 'users.id = employees.user_id')
+			->where('users.role_id', 3)
+			->where('employees.ra_id', $ra_id)
+			->order_by('users.name', 'ASC')
+			->get()
+			->result();
+	}
 
 	public function get_employee_by_user_id($user_id)
 	{
@@ -30,7 +49,15 @@ class Employee_model extends CI_Model
 			->row();
 	}
 
-	public function get_all_employees_with_ra()
+	public function get_employee_by_id($employee_id)
+	{
+		return $this->db
+			->where('id', $employee_id)
+			->get('employees')
+			->row();
+	}
+
+	public function get_all_employees()
 	{
 		return $this->db
 			->select('
@@ -47,7 +74,6 @@ class Employee_model extends CI_Model
 			->join('users', 'users.id = employees.user_id')
 			->join('employees AS ra', 'ra.id = employees.ra_id', 'left')
 			->join('users AS ra_user', 'ra_user.id = ra.user_id', 'left')
-			->where('users.role_id', 3)
 			->order_by('users.name', 'ASC')
 			->get()
 			->result();
