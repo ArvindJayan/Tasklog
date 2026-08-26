@@ -41,8 +41,34 @@ class Tasks_model extends CI_Model
 	public function get_task_by_id($task_id)
 	{
 		return $this->db
-			->where('id', $task_id)
-			->get('tasks')
+			->select('
+			tasks.*,
+			assigned_user.name AS assigned_to_name,
+			assigned_employee.employee_code AS assigned_to_code,
+			assigner_user.name AS assigned_by_name,
+			assigner_employee.employee_code AS assigned_by_code
+		')
+			->from('tasks')
+			->join(
+				'employees AS assigned_employee',
+				'assigned_employee.id = tasks.assigned_to'
+			)
+			->join(
+				'users AS assigned_user',
+				'assigned_user.id = assigned_employee.user_id'
+			)
+			->join(
+				'employees AS assigner_employee',
+				'assigner_employee.id = tasks.assigned_by',
+				'left'
+			)
+			->join(
+				'users AS assigner_user',
+				'assigner_user.id = assigner_employee.user_id',
+				'left'
+			)
+			->where('tasks.id', $task_id)
+			->get()
 			->row();
 	}
 
@@ -60,11 +86,7 @@ class Tasks_model extends CI_Model
 			return false;
 		}
 
-		return (int) $task->assigned_by === (int) $employee_id
-			|| (
-				(int) $task->assigned_to === (int) $employee_id
-				&& $task->assigned_by === null
-			);
+		return (int) $task->assigned_to === (int) $employee_id;
 	}
 
 	public function can_delete_task($task, $employee_id)
@@ -73,11 +95,7 @@ class Tasks_model extends CI_Model
 			return false;
 		}
 
-		return (int) $task->assigned_by === (int) $employee_id
-			|| (
-				(int) $task->assigned_to === (int) $employee_id
-				&& $task->assigned_by === null
-			);
+		return (int) $task->assigned_to === (int) $employee_id;
 	}
 
 	public function update_task($task_id, $task_data)

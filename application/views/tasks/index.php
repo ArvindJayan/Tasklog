@@ -243,7 +243,7 @@
 
 					<?php else: ?>
 
-						<div class="table-responsive rounded-2 overflow-hidden">
+						<div>
 
 							<table class="table table-dark table-borderless align-middle mb-0">
 
@@ -284,12 +284,13 @@
 												$this->session->userdata('user_id')
 											)->id;
 
-										$can_manage =
-											(int) $task->assigned_by === (int) $employee_id
-											|| (
-												(int) $task->assigned_to === (int) $employee_id
-												&& $task->assigned_by === null
-											);
+										$can_edit =
+											(int) $task->assigned_to === (int) $employee_id
+											|| (int) $task->assigned_by === (int) $employee_id;
+
+										$can_delete =
+											(int) $task->assigned_to === (int) $employee_id
+											|| (int) $task->assigned_by === (int) $employee_id;
 										?>
 
 										<tr class="task-row border-bottom border-tasklog" id="task-row-<?= $task->id; ?>">
@@ -372,29 +373,29 @@
 
 														</li>
 
-														<?php if ($can_manage): ?>
+														<?php if ($can_edit): ?>
 
 															<li>
-
 																<button type="button" class="dropdown-item edit-task-btn"
 																	data-task-id="<?= $task->id; ?>">
 																	Edit
 																</button>
-
 															</li>
+
+														<?php endif; ?>
+
+														<?php if ($can_delete): ?>
 
 															<li>
 																<hr class="dropdown-divider border-tasklog">
 															</li>
 
 															<li>
-
 																<button type="button"
 																	class="dropdown-item text-danger delete-task-btn"
 																	data-task-id="<?= $task->id; ?>">
 																	Delete
 																</button>
-
 															</li>
 
 														<?php endif; ?>
@@ -456,12 +457,15 @@
 								</label>
 
 								<select class="form-select" name="assigned_to" required>
-
-									<option value="">
-										Select employee
+									<option value="<?= $this->Employee_model
+										->get_employee_by_user_id($this->session->userdata('user_id'))->id; ?>">
+										Myself
 									</option>
 
-									<?php foreach ($this->Employee_model->get_all_employees() as $assigned_employee): ?>
+									<?php foreach ($this->Employee_model->get_employees_by_ra(
+										$this->Employee_model
+											->get_employee_by_user_id($this->session->userdata('user_id'))->id
+									) as $assigned_employee): ?>
 
 										<option value="<?= $assigned_employee->id; ?>">
 											<?= html_escape($assigned_employee->name); ?>
@@ -543,12 +547,11 @@
 
 					<div class="modal-footer border-tasklog">
 
-						<button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
+						<button type="button" class="btn btn-outline-info fw-semibold" data-bs-dismiss="modal">
 							Cancel
 						</button>
 
 						<button type="submit" class="btn btn-info fw-semibold">
-							<i class="bi bi-plus-lg me-1"></i>
 							Create Task
 						</button>
 
@@ -838,7 +841,7 @@
 
 					<div class="modal-footer border-tasklog">
 
-						<button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
+						<button type="button" class="btn btn-outline-info fw-semibold" data-bs-dismiss="modal">
 							Cancel
 						</button>
 
@@ -883,7 +886,7 @@
 
 				<div class="modal-footer border-tasklog">
 
-					<button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
+					<button type="button" class="btn btn-outline-info fw-semibold" data-bs-dismiss="modal">
 						Cancel
 					</button>
 

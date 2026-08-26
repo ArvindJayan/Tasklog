@@ -90,7 +90,6 @@ function formatDate(date) {
 	});
 }
 
-
 document
 	.getElementById("createTaskForm")
 	.addEventListener("submit", function (event) {
@@ -132,7 +131,6 @@ document
 				submitButton.disabled = false;
 			});
 	});
-
 
 document.querySelectorAll(".view-task-btn").forEach((button) => {
 	button.addEventListener("click", function () {
@@ -180,10 +178,14 @@ document.querySelectorAll(".view-task-btn").forEach((button) => {
 				);
 
 				document.getElementById("viewTaskAssignedTo").textContent =
-					task.assigned_to_name || "Not assigned";
+					task.assigned_to_name
+						? `${task.assigned_to_name} (${task.assigned_to_code})`
+						: "Not assigned";
 
 				document.getElementById("viewTaskAssignedBy").textContent =
-					task.assigned_by_name || "Self-created";
+					task.assigned_by_name
+						? `${task.assigned_by_name} (${task.assigned_by_code})`
+						: "Self-created";
 
 				document.getElementById("viewTaskCreatedAt").textContent =
 					task.created_at || "—";

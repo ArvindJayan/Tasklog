@@ -57,20 +57,24 @@ class Tasks extends Employee_Controller
 			if ($role_id == 2) {
 				$assigned_to = (int) $this->input->post('assigned_to');
 
-				$assigned_employee = $this->Employee_model->get_employee_by_id($assigned_to);
+				if ($assigned_to === (int) $employee->id) {
+					$assigned_by = null;
+				} else {
+					$assigned_employee = $this->Employee_model->get_employee_by_id($assigned_to);
 
-				if (!$assigned_employee) {
-					return $this->json_response(false, 'Please select a valid employee.');
+					if (!$assigned_employee) {
+						return $this->json_response(false, 'Please select a valid employee.');
+					}
+
+					if (!$this->Tasks_model->employee_belongs_to_ra($assigned_to, $employee->id)) {
+						return $this->json_response(
+							false,
+							'You can only assign tasks to employees assigned to you.'
+						);
+					}
+
+					$assigned_by = $employee->id;
 				}
-
-				if (!$this->Tasks_model->employee_belongs_to_ra($assigned_to, $employee->id)) {
-					return $this->json_response(
-						false,
-						'You can only assign tasks to employees assigned to you.'
-					);
-				}
-
-				$assigned_by = $employee->id;
 			}
 
 			$task_data = [
@@ -156,7 +160,7 @@ class Tasks extends Employee_Controller
 			return $this->json_response(false, 'Task not found.', 404);
 		}
 
-		if (!$this->Tasks_model->can_delete_task($task, $employee->id)) {
+		if (!$this->Tasks_model->can_edit_task($task, $employee->id)) {
 			return $this->json_response(
 				false,
 				'You do not have permission to edit this task.',
