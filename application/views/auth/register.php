@@ -46,10 +46,10 @@
 	</style>
 </head>
 <body class="text-light">
-	<div class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
+	<div class="container min-vh-100 d-flex align-items-center justify-content-center">
 		<div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
 			<div class="card register-card border rounded-4 shadow">
-				<div class="card-body p-4 p-md-5">
+				<div class="card-body p-4">
 					<div class="text-center mb-4">
 						<a href="<?= base_url(); ?>" class="text-decoration-none">
 							<h2 class="fw-bold text-light">Task<span class="text-cyan">Log</span></h2>
