@@ -76,6 +76,52 @@
 		.task-row:hover {
 			background-color: rgba(34, 211, 238, 0.04);
 		}
+
+		.dropdown-menu {
+			background-color: var(--tasklog-surface);
+			border-color: var(--tasklog-border);
+		}
+
+		.dropdown-item {
+			color: var(--tasklog-secondary);
+		}
+
+		.dropdown-item:hover {
+			background-color: rgba(34, 211, 238, 0.08);
+			color: var(--tasklog-text);
+		}
+
+		.form-control,
+		.form-select {
+			background-color: #0b1120;
+			border-color: var(--tasklog-border);
+			color: var(--tasklog-text);
+		}
+
+		.form-control:focus,
+		.form-select:focus {
+			background-color: #0b1120;
+			border-color: var(--tasklog-cyan);
+			color: var(--tasklog-text);
+			box-shadow: 0 0 0 0.2rem rgba(34, 211, 238, 0.15);
+		}
+
+		.form-control::placeholder {
+			color: var(--tasklog-muted);
+		}
+
+		.form-select option {
+			background-color: var(--tasklog-surface);
+			color: var(--tasklog-text);
+		}
+
+		.form-control[type="date"]::-webkit-calendar-picker-indicator {
+			filter: invert(1);
+		}
+
+		.modal-content {
+			box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.4);
+		}
 	</style>
 </head>
 
@@ -99,15 +145,18 @@
 				</a>
 
 			</div>
+
 		</div>
 	</nav>
 
 	<main>
+
 		<div class="container py-5">
 
 			<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
 
 				<div>
+
 					<h1 class="fw-bold mb-1">
 						Welcome back, <?= html_escape($this->session->userdata('name')); ?>
 					</h1>
@@ -119,9 +168,12 @@
 							Here's an overview of your tasks.
 						<?php endif; ?>
 					</p>
+
 				</div>
 
 			</div>
+
+			<div id="alertContainer"></div>
 
 			<?php if ($role_id == 1): ?>
 
@@ -363,12 +415,16 @@
 									You don't have any tasks assigned to you.
 								</p>
 
-								<a href="<?= site_url('tasks'); ?>" class="btn btn-info fw-semibold">
+								<button
+									type="button"
+									class="btn btn-info fw-semibold"
+									data-bs-toggle="modal"
+									data-bs-target="#createTaskModal">
 
 									<i class="bi bi-plus-lg me-1"></i>
 									Create Your First Task
 
-								</a>
+								</button>
 
 							</div>
 
@@ -435,8 +491,7 @@
 													];
 													?>
 
-													<span
-														class="badge <?= $priority_classes[$task->priority] ?? 'text-bg-secondary'; ?>">
+													<span class="badge <?= $priority_classes[$task->priority] ?? 'text-bg-secondary'; ?>">
 														<?= ucfirst($task->priority); ?>
 													</span>
 
@@ -453,8 +508,7 @@
 													];
 													?>
 
-													<span
-														class="badge <?= $status_classes[$task->status] ?? 'text-bg-secondary'; ?>">
+													<span class="badge <?= $status_classes[$task->status] ?? 'text-bg-secondary'; ?>">
 														<?= ucwords(str_replace('_', ' ', $task->status)); ?>
 													</span>
 
@@ -487,9 +541,209 @@
 			<?php endif; ?>
 
 		</div>
+
 	</main>
 
+	<!-- CREATE MODAL -->
+
+	<div class="modal fade" id="createTaskModal" tabindex="-1" aria-hidden="true">
+
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+
+			<div class="modal-content bg-surface border-tasklog text-white">
+
+				<div class="modal-header border-tasklog">
+
+					<h5 class="modal-title fw-bold">
+						Assign Task
+					</h5>
+
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+				</div>
+
+				<form id="createTaskForm">
+
+					<div class="modal-body">
+
+						<div class="mb-3">
+
+							<label class="form-label text-secondary">
+								Task Title
+							</label>
+
+							<input
+								type="text"
+								class="form-control"
+								name="title"
+								maxlength="200"
+								required>
+
+						</div>
+
+						<div class="mb-3">
+
+							<label class="form-label text-secondary">
+								Description
+							</label>
+
+							<textarea
+								class="form-control"
+								name="description"
+								rows="4"></textarea>
+
+						</div>
+
+						<div class="mb-3">
+
+							<label class="form-label text-secondary">
+								Assign To
+							</label>
+
+							<select
+								class="form-select"
+								name="assigned_to"
+								required>
+
+								<option value="">
+									Select employee
+								</option>
+
+								<?php if (!empty($employees)): ?>
+
+									<?php foreach ($employees as $employee): ?>
+
+										<option value="<?= $employee->id; ?>">
+											<?= html_escape($employee->name); ?>
+											<?php if (!empty($employee->employee_code)): ?>
+												(<?= html_escape($employee->employee_code); ?>)
+											<?php endif; ?>
+										</option>
+
+									<?php endforeach; ?>
+
+								<?php endif; ?>
+
+							</select>
+
+						</div>
+
+						<div class="row g-3">
+
+							<div class="col-md-4">
+
+								<label class="form-label text-secondary">
+									Priority
+								</label>
+
+								<select class="form-select" name="priority">
+
+									<option value="low">
+										Low
+									</option>
+
+									<option value="medium" selected>
+										Medium
+									</option>
+
+									<option value="high">
+										High
+									</option>
+
+									<option value="critical">
+										Critical
+									</option>
+
+								</select>
+
+							</div>
+
+							<div class="col-md-4">
+
+								<label class="form-label text-secondary">
+									Status
+								</label>
+
+								<select class="form-select" name="status">
+
+									<option value="pending" selected>
+										Pending
+									</option>
+
+									<option value="in_progress">
+										In Progress
+									</option>
+
+									<option value="completed">
+										Completed
+									</option>
+
+									<option value="cancelled">
+										Cancelled
+									</option>
+
+								</select>
+
+							</div>
+
+							<div class="col-md-4">
+
+								<label class="form-label text-secondary">
+									Due Date
+								</label>
+
+								<input
+									type="date"
+									class="form-control"
+									name="due_date">
+
+							</div>
+
+						</div>
+
+					</div>
+
+					<div class="modal-footer border-tasklog">
+
+						<button
+							type="button"
+							class="btn btn-outline-light"
+							data-bs-dismiss="modal">
+
+							Cancel
+
+						</button>
+
+						<button
+							type="submit"
+							class="btn btn-info fw-semibold">
+
+							Assign Task
+
+						</button>
+
+					</div>
+
+				</form>
+
+			</div>
+
+		</div>
+
+	</div>
+
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script>
+		const taskUrls = {
+			create: '<?= site_url('tasks/create'); ?>',
+			view: '<?= site_url('tasks/view/'); ?>',
+			edit: '<?= site_url('tasks/edit/'); ?>',
+			delete: '<?= site_url('tasks/delete/'); ?>'
+		};
+	</script>
+
+	<script src="<?= base_url('application/assets/js/tasks.js'); ?>"></script>
 
 </body>
 

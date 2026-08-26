@@ -1,19 +1,34 @@
-const createModal = new bootstrap.Modal(
-	document.getElementById("createTaskModal"),
-);
+const createTaskModalElement = document.getElementById("createTaskModal");
+const viewTaskModalElement = document.getElementById("viewTaskModal");
+const editTaskModalElement = document.getElementById("editTaskModal");
+const deleteTaskModalElement = document.getElementById("deleteTaskModal");
 
-const viewModal = new bootstrap.Modal(document.getElementById("viewTaskModal"));
+const createModal = createTaskModalElement
+	? new bootstrap.Modal(createTaskModalElement)
+	: null;
 
-const editModal = new bootstrap.Modal(document.getElementById("editTaskModal"));
+const viewModal = viewTaskModalElement
+	? new bootstrap.Modal(viewTaskModalElement)
+	: null;
 
-const deleteModal = new bootstrap.Modal(
-	document.getElementById("deleteTaskModal"),
-);
+const editModal = editTaskModalElement
+	? new bootstrap.Modal(editTaskModalElement)
+	: null;
+
+const deleteModal = deleteTaskModalElement
+	? new bootstrap.Modal(deleteTaskModalElement)
+	: null;
 
 let deleteTaskId = null;
 
 function showAlert(message, type = "success") {
-	document.getElementById("alertContainer").innerHTML = `
+	const container = document.getElementById("alertContainer");
+
+	if (!container) {
+		return;
+	}
+
+	container.innerHTML = `
 		<div class="alert alert-${type} alert-dismissible fade show" role="alert">
 			${message}
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -83,16 +98,17 @@ function formatDate(date) {
 		return "No due date";
 	}
 
-	return new Date(date).toLocaleDateString("en-GB", {
+	return new Date(date + "T00:00:00").toLocaleDateString("en-GB", {
 		day: "2-digit",
 		month: "short",
 		year: "numeric",
 	});
 }
 
-document
-	.getElementById("createTaskForm")
-	.addEventListener("submit", function (event) {
+const createTaskForm = document.getElementById("createTaskForm");
+
+if (createTaskForm) {
+	createTaskForm.addEventListener("submit", function (event) {
 		event.preventDefault();
 
 		const form = this;
@@ -114,7 +130,10 @@ document
 					return;
 				}
 
-				createModal.hide();
+				if (createModal) {
+					createModal.hide();
+				}
+
 				form.reset();
 
 				showAlert(data.message);
@@ -125,22 +144,32 @@ document
 			})
 			.catch((error) => {
 				console.error("Create error:", error);
-				showAlert(error.message || "Unable to create task.", "danger");
+				showAlert(
+					error.message || "Unable to create task.",
+					"danger",
+				);
 			})
 			.finally(() => {
 				submitButton.disabled = false;
 			});
 	});
+}
 
 document.querySelectorAll(".view-task-btn").forEach((button) => {
 	button.addEventListener("click", function () {
 		const taskId = this.dataset.taskId;
 
-		document.getElementById("viewTaskLoading").classList.remove("d-none");
-		document.getElementById("viewTaskContent").classList.add("d-none");
-		document.getElementById("viewTaskError").classList.add("d-none");
+		const loading = document.getElementById("viewTaskLoading");
+		const content = document.getElementById("viewTaskContent");
+		const errorElement = document.getElementById("viewTaskError");
 
-		viewModal.show();
+		loading.classList.remove("d-none");
+		content.classList.add("d-none");
+		errorElement.classList.add("d-none");
+
+		if (viewModal) {
+			viewModal.show();
+		}
 
 		fetch(taskUrls.view + taskId, {
 			headers: {
@@ -149,19 +178,18 @@ document.querySelectorAll(".view-task-btn").forEach((button) => {
 		})
 			.then(parseResponse)
 			.then((data) => {
-				document.getElementById("viewTaskLoading").classList.add("d-none");
+				loading.classList.add("d-none");
 
 				if (!data.success) {
-					document.getElementById("viewTaskError").textContent = data.message;
-
-					document.getElementById("viewTaskError").classList.remove("d-none");
-
+					errorElement.textContent = data.message;
+					errorElement.classList.remove("d-none");
 					return;
 				}
 
 				const task = data.task;
 
-				document.getElementById("viewTaskTitle").textContent = task.title || "";
+				document.getElementById("viewTaskTitle").textContent =
+					task.title || "";
 
 				document.getElementById("viewTaskDescription").textContent =
 					task.description || "No description provided.";
@@ -169,22 +197,28 @@ document.querySelectorAll(".view-task-btn").forEach((button) => {
 				document.getElementById("viewTaskPriority").innerHTML =
 					getPriorityBadge(task.priority);
 
-				document.getElementById("viewTaskStatus").innerHTML = getStatusBadge(
-					task.status,
-				);
+				document.getElementById("viewTaskStatus").innerHTML =
+					getStatusBadge(task.status);
 
-				document.getElementById("viewTaskDueDate").textContent = formatDate(
-					task.due_date,
-				);
+				document.getElementById("viewTaskDueDate").textContent =
+					formatDate(task.due_date);
 
 				document.getElementById("viewTaskAssignedTo").textContent =
 					task.assigned_to_name
-						? `${task.assigned_to_name} (${task.assigned_to_code})`
+						? `${task.assigned_to_name}${
+								task.assigned_to_code
+									? ` (${task.assigned_to_code})`
+									: ""
+							}`
 						: "Not assigned";
 
 				document.getElementById("viewTaskAssignedBy").textContent =
 					task.assigned_by_name
-						? `${task.assigned_by_name} (${task.assigned_by_code})`
+						? `${task.assigned_by_name}${
+								task.assigned_by_code
+									? ` (${task.assigned_by_code})`
+									: ""
+							}`
 						: "Self-created";
 
 				document.getElementById("viewTaskCreatedAt").textContent =
@@ -193,15 +227,16 @@ document.querySelectorAll(".view-task-btn").forEach((button) => {
 				document.getElementById("viewTaskUpdatedAt").textContent =
 					task.updated_at || "—";
 
-				document.getElementById("viewTaskContent").classList.remove("d-none");
+				content.classList.remove("d-none");
 			})
 			.catch((error) => {
-				document.getElementById("viewTaskLoading").classList.add("d-none");
+				loading.classList.add("d-none");
 
-				document.getElementById("viewTaskError").textContent =
-					error.message || "Unable to load task. Please try again.";
+				errorElement.textContent =
+					error.message ||
+					"Unable to load task. Please try again.";
 
-				document.getElementById("viewTaskError").classList.remove("d-none");
+				errorElement.classList.remove("d-none");
 			});
 	});
 });
@@ -225,30 +260,43 @@ document.querySelectorAll(".edit-task-btn").forEach((button) => {
 				const task = data.task;
 
 				document.getElementById("editTaskId").value = task.id;
-				document.getElementById("editTitle").value = task.title;
+				document.getElementById("editTitle").value = task.title || "";
 				document.getElementById("editDescription").value =
 					task.description || "";
-				document.getElementById("editPriority").value = task.priority;
-				document.getElementById("editStatus").value = task.status;
-				document.getElementById("editDueDate").value = task.due_date || "";
+				document.getElementById("editPriority").value =
+					task.priority;
+				document.getElementById("editStatus").value =
+					task.status;
+				document.getElementById("editDueDate").value =
+					task.due_date || "";
 
-				editModal.show();
+				if (editModal) {
+					editModal.show();
+				}
 			})
 			.catch((error) => {
 				console.error("Load edit error:", error);
-				showAlert(error.message || "Unable to load task.", "danger");
+
+				showAlert(
+					error.message || "Unable to load task.",
+					"danger",
+				);
 			});
 	});
 });
 
-document
-	.getElementById("editTaskForm")
-	.addEventListener("submit", function (event) {
+const editTaskForm = document.getElementById("editTaskForm");
+
+if (editTaskForm) {
+	editTaskForm.addEventListener("submit", function (event) {
 		event.preventDefault();
 
 		const form = this;
-		const taskId = document.getElementById("editTaskId").value;
-		const submitButton = form.querySelector('button[type="submit"]');
+		const taskId =
+			document.getElementById("editTaskId").value;
+
+		const submitButton =
+			form.querySelector('button[type="submit"]');
 
 		submitButton.disabled = true;
 
@@ -266,25 +314,35 @@ document
 					return;
 				}
 
-				editModal.hide();
+				if (editModal) {
+					editModal.hide();
+				}
 
-				const row = document.getElementById("task-row-" + taskId);
+				const row = document.getElementById(
+					"task-row-" + taskId,
+				);
 
 				if (row) {
 					const cells = row.querySelectorAll("td");
 
-					cells[0].querySelector(".fw-semibold").textContent = form.title.value;
+					cells[0].querySelector(
+						".fw-semibold",
+					).textContent = form.title.value;
 
-					const description = cells[0].querySelector("small");
+					const description =
+						cells[0].querySelector("small");
 
 					if (form.description.value.trim()) {
 						if (description) {
-							description.textContent = form.description.value;
+							description.textContent =
+								form.description.value;
 						} else {
-							const small = document.createElement("small");
+							const small =
+								document.createElement("small");
 
 							small.className = "text-muted";
-							small.textContent = form.description.value;
+							small.textContent =
+								form.description.value;
 
 							cells[0].appendChild(small);
 						}
@@ -292,15 +350,21 @@ document
 						description.remove();
 					}
 
-					cells[1].querySelector(".badge").outerHTML = getPriorityBadge(
+					cells[2].querySelector(
+						".badge",
+					).outerHTML = getPriorityBadge(
 						form.priority.value,
 					);
 
-					cells[2].querySelector(".badge").outerHTML = getStatusBadge(
+					cells[3].querySelector(
+						".badge",
+					).outerHTML = getStatusBadge(
 						form.status.value,
 					);
 
-					cells[3].textContent = formatDate(form.due_date.value);
+					cells[4].textContent = formatDate(
+						form.due_date.value,
+					);
 				}
 
 				showAlert(data.message);
@@ -308,24 +372,33 @@ document
 			.catch((error) => {
 				console.error("Edit error:", error);
 
-				showAlert(error.message || "Unable to update task.", "danger");
+				showAlert(
+					error.message ||
+						"Unable to update task.",
+					"danger",
+				);
 			})
 			.finally(() => {
 				submitButton.disabled = false;
 			});
 	});
+}
 
 document.querySelectorAll(".delete-task-btn").forEach((button) => {
 	button.addEventListener("click", function () {
 		deleteTaskId = this.dataset.taskId;
 
-		deleteModal.show();
+		if (deleteModal) {
+			deleteModal.show();
+		}
 	});
 });
 
-document
-	.getElementById("confirmDeleteBtn")
-	.addEventListener("click", function () {
+const confirmDeleteButton =
+	document.getElementById("confirmDeleteBtn");
+
+if (confirmDeleteButton) {
+	confirmDeleteButton.addEventListener("click", function () {
 		if (!deleteTaskId) {
 			return;
 		}
@@ -348,19 +421,28 @@ document
 					return;
 				}
 
-				deleteModal.hide();
+				if (deleteModal) {
+					deleteModal.hide();
+				}
 
-				document.getElementById("task-row-" + taskId)?.remove();
+				document
+					.getElementById("task-row-" + taskId)
+					?.remove();
 
 				showAlert(data.message);
 			})
 			.catch((error) => {
 				console.error("Delete error:", error);
 
-				showAlert(error.message || "Unable to delete task.", "danger");
+				showAlert(
+					error.message ||
+						"Unable to delete task.",
+					"danger",
+				);
 			})
 			.finally(() => {
 				button.disabled = false;
 				deleteTaskId = null;
 			});
 	});
+}
