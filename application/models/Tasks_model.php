@@ -54,6 +54,19 @@ class Tasks_model extends CI_Model
 			->count_all_results('employees') > 0;
 	}
 
+	public function can_edit_task($task, $employee_id)
+	{
+		if (!$task) {
+			return false;
+		}
+
+		return (int) $task->assigned_by === (int) $employee_id
+			|| (
+				(int) $task->assigned_to === (int) $employee_id
+				&& $task->assigned_by === null
+			);
+	}
+
 	public function can_delete_task($task, $employee_id)
 	{
 		if (!$task) {

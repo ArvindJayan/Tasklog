@@ -44,7 +44,7 @@ class Tasks extends Employee_Controller
 			$due_date = $this->input->post('due_date', true);
 
 			if ($title === '') {
-				$this->json_response(false, 'Task title is required.', 400);
+				return $this->json_response(false, 'Task title is required.');
 			}
 
 			if (!in_array($priority, ['low', 'medium', 'high', 'critical'])) {
@@ -60,11 +60,14 @@ class Tasks extends Employee_Controller
 				$assigned_employee = $this->Employee_model->get_employee_by_id($assigned_to);
 
 				if (!$assigned_employee) {
-					$this->json_response(false, 'Please select a valid employee.', 400);
+					return $this->json_response(false, 'Please select a valid employee.');
 				}
 
 				if (!$this->Tasks_model->employee_belongs_to_ra($assigned_to, $employee->id)) {
-					$this->json_response(false, 'You can only assign tasks to employees assigned to you.', 403);
+					return $this->json_response(
+						false,
+						'You can only assign tasks to employees assigned to you.'
+					);
 				}
 
 				$assigned_by = $employee->id;
@@ -80,10 +83,10 @@ class Tasks extends Employee_Controller
 			];
 
 			if (!$this->Tasks_model->create_task($task_data)) {
-				$this->json_response(false, 'Unable to create task.', 500);
+				return $this->json_response(false, 'Unable to create task.');
 			}
 
-			$this->json_response(true, 'Task created successfully.');
+			return $this->json_response(true, 'Task created successfully.');
 		}
 
 		$data = [
@@ -123,15 +126,9 @@ class Tasks extends Employee_Controller
 		}
 
 		if ($this->input->is_ajax_request()) {
-			$this->output
-				->set_status_header(200)
-				->set_content_type('application/json')
-				->set_output(json_encode([
-					'success' => true,
-					'task' => $task
-				]));
-
-			return;
+			return $this->json_response(true, '', 200, [
+				'task' => $task
+			]);
 		}
 
 		$data['task'] = $task;
@@ -142,7 +139,7 @@ class Tasks extends Employee_Controller
 	public function edit($id)
 	{
 		if (!$this->input->is_ajax_request()) {
-			$this->json_response(false, 'Invalid request.', 400);
+			show_error('Invalid request.', 400);
 		}
 
 		$user_id = $this->session->userdata('user_id');
@@ -150,20 +147,21 @@ class Tasks extends Employee_Controller
 		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
 
 		if (!$employee) {
-			$this->json_response(false, 'Unauthorized access.', 403);
+			return $this->json_response(false, 'Unauthorized access.', 403);
 		}
 
 		$task = $this->Tasks_model->get_task_by_id((int) $id);
 
 		if (!$task) {
-			$this->json_response(false, 'Task not found.', 404);
+			return $this->json_response(false, 'Task not found.', 404);
 		}
 
-		if (
-			(int) $task->assigned_to !== (int) $employee->id &&
-			(int) $task->assigned_by !== (int) $employee->id
-		) {
-			$this->json_response(false, 'You do not have permission to edit this task.', 403);
+		if (!$this->Tasks_model->can_delete_task($task, $employee->id)) {
+			return $this->json_response(
+				false,
+				'You do not have permission to edit this task.',
+				403
+			);
 		}
 
 		$title = trim($this->input->post('title', true));
@@ -173,15 +171,15 @@ class Tasks extends Employee_Controller
 		$due_date = $this->input->post('due_date', true);
 
 		if ($title === '') {
-			$this->json_response(false, 'Task title is required.', 400);
+			return $this->json_response(false, 'Task title is required.');
 		}
 
 		if (!in_array($priority, ['low', 'medium', 'high', 'critical'])) {
-			$this->json_response(false, 'Invalid priority.', 400);
+			return $this->json_response(false, 'Invalid priority.');
 		}
 
 		if (!in_array($status, ['pending', 'in_progress', 'completed', 'cancelled'])) {
-			$this->json_response(false, 'Invalid status.', 400);
+			return $this->json_response(false, 'Invalid status.');
 		}
 
 		$completed_at = $task->completed_at;
@@ -204,16 +202,16 @@ class Tasks extends Employee_Controller
 		];
 
 		if (!$this->Tasks_model->update_task((int) $id, $task_data)) {
-			$this->json_response(false, 'Unable to update task.', 500);
+			return $this->json_response(false, 'Unable to update task.');
 		}
 
-		$this->json_response(true, 'Task updated successfully.');
+		return $this->json_response(true, 'Task updated successfully.');
 	}
 
 	public function delete($id)
 	{
 		if (!$this->input->is_ajax_request()) {
-			$this->json_response(false, 'Invalid request.', 400);
+			show_error('Invalid request.', 400);
 		}
 
 		$user_id = $this->session->userdata('user_id');
@@ -221,39 +219,40 @@ class Tasks extends Employee_Controller
 		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
 
 		if (!$employee) {
-			$this->json_response(false, 'Unauthorized access.', 403);
+			return $this->json_response(false, 'Unauthorized access.', 403);
 		}
 
 		$task = $this->Tasks_model->get_task_by_id((int) $id);
 
 		if (!$task) {
-			$this->json_response(false, 'Task not found.', 404);
+			return $this->json_response(false, 'Task not found.', 404);
 		}
 
-		if (
-			(int) $task->assigned_by !== (int) $employee->id &&
-			!((int) $task->assigned_to === (int) $employee->id && $task->assigned_by === null)
-		) {
-			$this->json_response(false, 'You do not have permission to delete this task.', 403);
+		if (!$this->Tasks_model->can_delete_task($task, $employee->id)) {
+			return $this->json_response(
+				false,
+				'You do not have permission to delete this task.',
+				403
+			);
 		}
 
 		if (!$this->Tasks_model->delete_task((int) $id)) {
-			$this->json_response(false, 'Unable to delete task.', 500);
+			return $this->json_response(false, 'Unable to delete task.');
 		}
 
-		$this->json_response(true, 'Task deleted successfully.');
+		return $this->json_response(true, 'Task deleted successfully.');
 	}
 
-	private function json_response($success, $message, $status_code = 200)
+	private function json_response($success, $message = '', $status_code = 200, $extra = [])
 	{
+		$response = array_merge([
+			'success' => $success,
+			'message' => $message
+		], $extra);
+
 		$this->output
 			->set_status_header($status_code)
 			->set_content_type('application/json')
-			->set_output(json_encode([
-				'success' => $success,
-				'message' => $message
-			]));
-
-		exit;
+			->set_output(json_encode($response));
 	}
 }

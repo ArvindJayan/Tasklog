@@ -121,15 +121,6 @@
 					</p>
 				</div>
 
-				<?php if ($role_id != 1): ?>
-
-					<a href="<?= site_url('tasks/create'); ?>" class="btn btn-info fw-semibold">
-						<i class="bi bi-plus-lg me-1"></i>
-						New Task
-					</a>
-
-				<?php endif; ?>
-
 			</div>
 
 			<?php if ($role_id == 1): ?>
@@ -372,7 +363,7 @@
 									You don't have any tasks assigned to you.
 								</p>
 
-								<a href="<?= site_url('tasks/create'); ?>" class="btn btn-info fw-semibold">
+								<a href="<?= site_url('tasks'); ?>" class="btn btn-info fw-semibold">
 
 									<i class="bi bi-plus-lg me-1"></i>
 									Create Your First Task
