@@ -17,7 +17,7 @@
 
     <div class="container py-2">
 
-        <a class="navbar-brand fw-bold fs-3" href="<?= site_url('dashboard'); ?>">
+        <a class="navbar-brand fw-bold fs-2" href="<?= site_url('dashboard'); ?>">
             Task<span class="text-cyan">Log</span>
         </a>
 
