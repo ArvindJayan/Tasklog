@@ -217,6 +217,9 @@ document.querySelectorAll(".view-task-btn").forEach(button => {
 
 				const estimatedDuration = document.getElementById("viewTaskEstimatedDuration");
 				const actualDuration = document.getElementById("viewTaskActualDuration");
+				const dueDate = document.getElementById("viewTaskDueDate");
+				const assignedTo = document.getElementById("viewTaskAssignedTo");
+				const assignedBy = document.getElementById("viewTaskAssignedBy");
 
 				if (estimatedDuration) {
 					estimatedDuration.textContent = formatDuration(task.estimated_duration);
@@ -226,20 +229,21 @@ document.querySelectorAll(".view-task-btn").forEach(button => {
 					actualDuration.textContent = formatDuration(task.actual_duration);
 				}
 
-				document.getElementById("viewTaskDueDate").textContent = formatDate(task.due_date);
+				if (dueDate) {
+					dueDate.textContent = formatDate(task.due_date);
+				}
 
-				document.getElementById("viewTaskAssignedTo").textContent =
-					task.assigned_to_name
+				if (assignedTo) {
+					assignedTo.textContent = task.assigned_to_name
 						? `${task.assigned_to_name}${task.assigned_to_code ? ` (${task.assigned_to_code})` : ""}`
 						: "Not assigned";
+				}
 
-				document.getElementById("viewTaskAssignedBy").textContent =
-					task.assigned_by_name
+				if (assignedBy) {
+					assignedBy.textContent = task.assigned_by_name
 						? `${task.assigned_by_name}${task.assigned_by_code ? ` (${task.assigned_by_code})` : ""}`
 						: "Self-created";
-
-				document.getElementById("viewTaskCreatedAt").textContent = task.created_at || "—";
-				document.getElementById("viewTaskUpdatedAt").textContent = task.updated_at || "—";
+				}
 
 				content.classList.remove("d-none");
 			})
@@ -354,7 +358,9 @@ if (editTaskForm) {
 					}
 
 					if (estimatedDuration) {
-						estimatedDuration.textContent = formatDuration(Number(form.estimated_duration.value) * 60);
+						estimatedDuration.textContent = form.estimated_duration.value
+							? formatDuration(Number(form.estimated_duration.value) * 60)
+							: "Not specified";
 					}
 
 					if (dueDate) {

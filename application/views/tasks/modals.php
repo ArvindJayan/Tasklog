@@ -155,7 +155,7 @@
             </div>
 
             <div class="modal-footer border-tasklog">
-                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">
                     Close
                 </button>
             </div>
