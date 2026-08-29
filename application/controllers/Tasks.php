@@ -6,7 +6,6 @@ class Tasks extends Employee_Controller
 	public function __construct()
 	{
 		parent::__construct();
-
 		$this->load->model('Tasks_model');
 		$this->load->model('Employee_model');
 	}
@@ -14,7 +13,6 @@ class Tasks extends Employee_Controller
 	public function index()
 	{
 		$user_id = $this->session->userdata('user_id');
-
 		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
 
 		if (!$employee) {
@@ -33,32 +31,27 @@ class Tasks extends Employee_Controller
 		}
 
 		$user_id = $this->session->userdata('user_id');
-
 		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
 
 		if (!$employee) {
 			redirect('onboarding');
 		}
 
+		$filters = [
+			'search' => trim($this->input->get('search', true)),
+			'assigned_to' => $this->input->get('assigned_to', true),
+			'priority' => $this->input->get('priority', true),
+			'status' => $this->input->get('status', true),
+			'due_date' => $this->input->get('due_date', true)
+		];
+
 		$data = [
 			'tasks' => $this->Tasks_model->get_tasks_assigned_by_employee_id(
 				$employee->id,
-				[
-					'search' => trim($this->input->get('search', true)),
-					'assigned_to' => $this->input->get('assigned_to', true),
-					'priority' => $this->input->get('priority', true),
-					'status' => $this->input->get('status', true),
-					'due_date' => $this->input->get('due_date', true)
-				]
+				$filters
 			),
 			'employees' => $this->Employee_model->get_employees_by_ra($employee->id),
-			'filters' => [
-				'search' => trim($this->input->get('search', true)),
-				'assigned_to' => $this->input->get('assigned_to', true),
-				'priority' => $this->input->get('priority', true),
-				'status' => $this->input->get('status', true),
-				'due_date' => $this->input->get('due_date', true)
-			]
+			'filters' => $filters
 		];
 
 		$this->load->view('tasks/assigned', $data);
@@ -68,7 +61,6 @@ class Tasks extends Employee_Controller
 	{
 		$user_id = $this->session->userdata('user_id');
 		$role_id = $this->session->userdata('role_id');
-
 		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
 
 		if (!$employee) {
@@ -80,6 +72,7 @@ class Tasks extends Employee_Controller
 			$description = trim($this->input->post('description', true));
 			$priority = $this->input->post('priority', true);
 			$due_date = $this->input->post('due_date', true);
+			$estimated_duration = $this->input->post('estimated_duration', true);
 
 			if ($title === '') {
 				return $this->json_response(false, 'Task title is required.');
@@ -87,6 +80,15 @@ class Tasks extends Employee_Controller
 
 			if (!in_array($priority, ['low', 'medium', 'high', 'critical'])) {
 				$priority = 'medium';
+			}
+
+			$estimated_duration = $this->convert_duration_to_seconds($estimated_duration);
+
+			if ($estimated_duration === false) {
+				return $this->json_response(
+					false,
+					'Estimated duration must be greater than zero.'
+				);
 			}
 
 			$assigned_to = $employee->id;
@@ -101,10 +103,16 @@ class Tasks extends Employee_Controller
 					$assigned_employee = $this->Employee_model->get_employee_by_id($assigned_to);
 
 					if (!$assigned_employee) {
-						return $this->json_response(false, 'Please select a valid employee.');
+						return $this->json_response(
+							false,
+							'Please select a valid employee.'
+						);
 					}
 
-					if (!$this->Tasks_model->employee_belongs_to_ra($assigned_to, $employee->id)) {
+					if (!$this->Tasks_model->employee_belongs_to_ra(
+						$assigned_to,
+						$employee->id
+					)) {
 						return $this->json_response(
 							false,
 							'You can only assign tasks to employees assigned to you.'
@@ -121,7 +129,8 @@ class Tasks extends Employee_Controller
 				'assigned_to' => $assigned_to,
 				'assigned_by' => $assigned_by,
 				'priority' => $priority,
-				'due_date' => $due_date ?: null
+				'due_date' => $due_date ?: null,
+				'estimated_duration' => $estimated_duration
 			];
 
 			if (!$this->Tasks_model->create_task($task_data)) {
@@ -153,7 +162,6 @@ class Tasks extends Employee_Controller
 		}
 
 		$user_id = $this->session->userdata('user_id');
-
 		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
 
 		if (!$employee) {
@@ -174,7 +182,6 @@ class Tasks extends Employee_Controller
 		}
 
 		$data['task'] = $task;
-
 		$this->load->view('tasks/view', $data);
 	}
 
@@ -185,7 +192,6 @@ class Tasks extends Employee_Controller
 		}
 
 		$user_id = $this->session->userdata('user_id');
-
 		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
 
 		if (!$employee) {
@@ -211,6 +217,7 @@ class Tasks extends Employee_Controller
 		$priority = $this->input->post('priority', true);
 		$status = $this->input->post('status', true);
 		$due_date = $this->input->post('due_date', true);
+		$estimated_duration = $this->input->post('estimated_duration', true);
 
 		if ($title === '') {
 			return $this->json_response(false, 'Task title is required.');
@@ -224,14 +231,33 @@ class Tasks extends Employee_Controller
 			return $this->json_response(false, 'Invalid status.');
 		}
 
-		$completed_at = $task->completed_at;
+		$estimated_duration = $this->convert_duration_to_seconds($estimated_duration);
 
-		if ($status === 'completed' && $task->status !== 'completed') {
-			$completed_at = date('Y-m-d H:i:s');
+		if ($estimated_duration === false) {
+			return $this->json_response(
+				false,
+				'Estimated duration must be greater than zero.'
+			);
 		}
 
-		if ($status !== 'completed') {
+		$completed_at = $task->completed_at;
+		$actual_duration = $task->actual_duration;
+
+		if (
+			in_array($status, ['completed', 'cancelled']) &&
+			!in_array($task->status, ['completed', 'cancelled'])
+		) {
+			$completed_at = date('Y-m-d H:i:s');
+
+			$actual_duration = $this->Tasks_model->get_actual_duration(
+				$task->created_at,
+				$completed_at
+			);
+		}
+
+		if (!in_array($status, ['completed', 'cancelled'])) {
 			$completed_at = null;
+			$actual_duration = null;
 		}
 
 		$task_data = [
@@ -240,7 +266,9 @@ class Tasks extends Employee_Controller
 			'priority' => $priority,
 			'status' => $status,
 			'due_date' => $due_date ?: null,
-			'completed_at' => $completed_at
+			'estimated_duration' => $estimated_duration,
+			'completed_at' => $completed_at,
+			'actual_duration' => $actual_duration
 		];
 
 		if (!$this->Tasks_model->update_task((int) $id, $task_data)) {
@@ -257,7 +285,6 @@ class Tasks extends Employee_Controller
 		}
 
 		$user_id = $this->session->userdata('user_id');
-
 		$employee = $this->Employee_model->get_employee_by_user_id($user_id);
 
 		if (!$employee) {
@@ -283,6 +310,21 @@ class Tasks extends Employee_Controller
 		}
 
 		return $this->json_response(true, 'Task deleted successfully.');
+	}
+
+	private function convert_duration_to_seconds($duration)
+	{
+		if ($duration === '' || $duration === null) {
+			return null;
+		}
+
+		$duration = (int) $duration;
+
+		if ($duration <= 0) {
+			return false;
+		}
+
+		return $duration * 60;
 	}
 
 	private function json_response($success, $message = '', $status_code = 200, $extra = [])

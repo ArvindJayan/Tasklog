@@ -3,21 +3,10 @@ const viewTaskModalElement = document.getElementById("viewTaskModal");
 const editTaskModalElement = document.getElementById("editTaskModal");
 const deleteTaskModalElement = document.getElementById("deleteTaskModal");
 
-const createModal = createTaskModalElement
-	? new bootstrap.Modal(createTaskModalElement)
-	: null;
-
-const viewModal = viewTaskModalElement
-	? new bootstrap.Modal(viewTaskModalElement)
-	: null;
-
-const editModal = editTaskModalElement
-	? new bootstrap.Modal(editTaskModalElement)
-	: null;
-
-const deleteModal = deleteTaskModalElement
-	? new bootstrap.Modal(deleteTaskModalElement)
-	: null;
+const createModal = createTaskModalElement ? new bootstrap.Modal(createTaskModalElement) : null;
+const viewModal = viewTaskModalElement ? new bootstrap.Modal(viewTaskModalElement) : null;
+const editModal = editTaskModalElement ? new bootstrap.Modal(editTaskModalElement) : null;
+const deleteModal = deleteTaskModalElement ? new bootstrap.Modal(deleteTaskModalElement) : null;
 
 let deleteTaskId = null;
 
@@ -64,7 +53,7 @@ function getPriorityBadge(priority) {
 		low: "text-bg-secondary",
 		medium: "text-bg-info",
 		high: "text-bg-warning",
-		critical: "text-bg-danger",
+		critical: "text-bg-danger"
 	};
 
 	return `
@@ -79,12 +68,12 @@ function getStatusBadge(status) {
 		pending: "text-bg-warning",
 		in_progress: "text-bg-info",
 		completed: "text-bg-success",
-		cancelled: "text-bg-secondary",
+		cancelled: "text-bg-secondary"
 	};
 
 	const label = status
 		.replace("_", " ")
-		.replace(/\b\w/g, (character) => character.toUpperCase());
+		.replace(/\b\w/g, character => character.toUpperCase());
 
 	return `
 		<span class="badge ${classes[status] || "text-bg-secondary"}">
@@ -101,14 +90,52 @@ function formatDate(date) {
 	return new Date(date + "T00:00:00").toLocaleDateString("en-GB", {
 		day: "2-digit",
 		month: "short",
-		year: "numeric",
+		year: "numeric"
 	});
+}
+
+function formatDuration(seconds) {
+	if (
+		seconds === null ||
+		seconds === undefined ||
+		seconds === "" ||
+		Number(seconds) <= 0
+	) {
+		return "Not specified";
+	}
+
+	const minutes = Math.floor(Number(seconds) / 60);
+	const hours = Math.floor(minutes / 60);
+	const remainingMinutes = minutes % 60;
+
+	if (hours > 0 && remainingMinutes > 0) {
+		return `${hours}h ${remainingMinutes}m`;
+	}
+
+	if (hours > 0) {
+		return `${hours}h`;
+	}
+
+	return `${remainingMinutes}m`;
+}
+
+function secondsToMinutes(seconds) {
+	if (
+		seconds === null ||
+		seconds === undefined ||
+		seconds === "" ||
+		Number(seconds) <= 0
+	) {
+		return "";
+	}
+
+	return Math.round(Number(seconds) / 60);
 }
 
 const createTaskForm = document.getElementById("createTaskForm");
 
 if (createTaskForm) {
-	createTaskForm.addEventListener("submit", function (event) {
+	createTaskForm.addEventListener("submit", function(event) {
 		event.preventDefault();
 
 		const form = this;
@@ -119,12 +146,12 @@ if (createTaskForm) {
 		fetch(taskUrls.create, {
 			method: "POST",
 			headers: {
-				"X-Requested-With": "XMLHttpRequest",
+				"X-Requested-With": "XMLHttpRequest"
 			},
-			body: new FormData(form),
+			body: new FormData(form)
 		})
 			.then(parseResponse)
-			.then((data) => {
+			.then(data => {
 				if (!data.success) {
 					showAlert(data.message, "danger");
 					return;
@@ -135,14 +162,13 @@ if (createTaskForm) {
 				}
 
 				form.reset();
-
 				showAlert(data.message);
 
 				setTimeout(() => {
 					location.reload();
 				}, 500);
 			})
-			.catch((error) => {
+			.catch(error => {
 				console.error("Create error:", error);
 				showAlert(error.message || "Unable to create task.", "danger");
 			})
@@ -152,10 +178,9 @@ if (createTaskForm) {
 	});
 }
 
-document.querySelectorAll(".view-task-btn").forEach((button) => {
-	button.addEventListener("click", function () {
+document.querySelectorAll(".view-task-btn").forEach(button => {
+	button.addEventListener("click", function() {
 		const taskId = this.dataset.taskId;
-
 		const loading = document.getElementById("viewTaskLoading");
 		const content = document.getElementById("viewTaskContent");
 		const errorElement = document.getElementById("viewTaskError");
@@ -170,11 +195,11 @@ document.querySelectorAll(".view-task-btn").forEach((button) => {
 
 		fetch(taskUrls.view + taskId, {
 			headers: {
-				"X-Requested-With": "XMLHttpRequest",
-			},
+				"X-Requested-With": "XMLHttpRequest"
+			}
 		})
 			.then(parseResponse)
-			.then((data) => {
+			.then(data => {
 				loading.classList.add("d-none");
 
 				if (!data.success) {
@@ -186,65 +211,57 @@ document.querySelectorAll(".view-task-btn").forEach((button) => {
 				const task = data.task;
 
 				document.getElementById("viewTaskTitle").textContent = task.title || "";
+				document.getElementById("viewTaskDescription").textContent = task.description || "No description provided.";
+				document.getElementById("viewTaskPriority").innerHTML = getPriorityBadge(task.priority);
+				document.getElementById("viewTaskStatus").innerHTML = getStatusBadge(task.status);
 
-				document.getElementById("viewTaskDescription").textContent =
-					task.description || "No description provided.";
+				const estimatedDuration = document.getElementById("viewTaskEstimatedDuration");
+				const actualDuration = document.getElementById("viewTaskActualDuration");
 
-				document.getElementById("viewTaskPriority").innerHTML =
-					getPriorityBadge(task.priority);
+				if (estimatedDuration) {
+					estimatedDuration.textContent = formatDuration(task.estimated_duration);
+				}
 
-				document.getElementById("viewTaskStatus").innerHTML = getStatusBadge(
-					task.status,
-				);
+				if (actualDuration) {
+					actualDuration.textContent = formatDuration(task.actual_duration);
+				}
 
-				document.getElementById("viewTaskDueDate").textContent = formatDate(
-					task.due_date,
-				);
+				document.getElementById("viewTaskDueDate").textContent = formatDate(task.due_date);
 
 				document.getElementById("viewTaskAssignedTo").textContent =
 					task.assigned_to_name
-						? `${task.assigned_to_name}${
-								task.assigned_to_code ? ` (${task.assigned_to_code})` : ""
-							}`
+						? `${task.assigned_to_name}${task.assigned_to_code ? ` (${task.assigned_to_code})` : ""}`
 						: "Not assigned";
 
 				document.getElementById("viewTaskAssignedBy").textContent =
 					task.assigned_by_name
-						? `${task.assigned_by_name}${
-								task.assigned_by_code ? ` (${task.assigned_by_code})` : ""
-							}`
+						? `${task.assigned_by_name}${task.assigned_by_code ? ` (${task.assigned_by_code})` : ""}`
 						: "Self-created";
 
-				document.getElementById("viewTaskCreatedAt").textContent =
-					task.created_at || "—";
-
-				document.getElementById("viewTaskUpdatedAt").textContent =
-					task.updated_at || "—";
+				document.getElementById("viewTaskCreatedAt").textContent = task.created_at || "—";
+				document.getElementById("viewTaskUpdatedAt").textContent = task.updated_at || "—";
 
 				content.classList.remove("d-none");
 			})
-			.catch((error) => {
+			.catch(error => {
 				loading.classList.add("d-none");
-
-				errorElement.textContent =
-					error.message || "Unable to load task. Please try again.";
-
+				errorElement.textContent = error.message || "Unable to load task. Please try again.";
 				errorElement.classList.remove("d-none");
 			});
 	});
 });
 
-document.querySelectorAll(".edit-task-btn").forEach((button) => {
-	button.addEventListener("click", function () {
+document.querySelectorAll(".edit-task-btn").forEach(button => {
+	button.addEventListener("click", function() {
 		const taskId = this.dataset.taskId;
 
 		fetch(taskUrls.view + taskId, {
 			headers: {
-				"X-Requested-With": "XMLHttpRequest",
-			},
+				"X-Requested-With": "XMLHttpRequest"
+			}
 		})
 			.then(parseResponse)
-			.then((data) => {
+			.then(data => {
 				if (!data.success) {
 					showAlert(data.message, "danger");
 					return;
@@ -254,19 +271,18 @@ document.querySelectorAll(".edit-task-btn").forEach((button) => {
 
 				document.getElementById("editTaskId").value = task.id;
 				document.getElementById("editTitle").value = task.title || "";
-				document.getElementById("editDescription").value =
-					task.description || "";
+				document.getElementById("editDescription").value = task.description || "";
 				document.getElementById("editPriority").value = task.priority;
 				document.getElementById("editStatus").value = task.status;
+				document.getElementById("editEstimatedDuration").value = secondsToMinutes(task.estimated_duration);
 				document.getElementById("editDueDate").value = task.due_date || "";
 
 				if (editModal) {
 					editModal.show();
 				}
 			})
-			.catch((error) => {
+			.catch(error => {
 				console.error("Load edit error:", error);
-
 				showAlert(error.message || "Unable to load task.", "danger");
 			});
 	});
@@ -275,12 +291,11 @@ document.querySelectorAll(".edit-task-btn").forEach((button) => {
 const editTaskForm = document.getElementById("editTaskForm");
 
 if (editTaskForm) {
-	editTaskForm.addEventListener("submit", function (event) {
+	editTaskForm.addEventListener("submit", function(event) {
 		event.preventDefault();
 
 		const form = this;
 		const taskId = document.getElementById("editTaskId").value;
-
 		const submitButton = form.querySelector('button[type="submit"]');
 
 		submitButton.disabled = true;
@@ -288,12 +303,12 @@ if (editTaskForm) {
 		fetch(taskUrls.edit + taskId, {
 			method: "POST",
 			headers: {
-				"X-Requested-With": "XMLHttpRequest",
+				"X-Requested-With": "XMLHttpRequest"
 			},
-			body: new FormData(form),
+			body: new FormData(form)
 		})
 			.then(parseResponse)
-			.then((data) => {
+			.then(data => {
 				if (!data.success) {
 					showAlert(data.message, "danger");
 					return;
@@ -306,37 +321,51 @@ if (editTaskForm) {
 				const row = document.getElementById("task-row-" + taskId);
 
 				if (row) {
-					const cells = row.querySelectorAll("td");
+					const title = row.querySelector(".task-title");
+					const description = row.querySelector(".task-description");
+					const priority = row.querySelector(".task-priority-cell");
+					const status = row.querySelector(".task-status-cell");
+					const estimatedDuration = row.querySelector(".task-estimated-duration");
+					const dueDate = row.querySelector(".task-due-date");
 
-					cells[0].querySelector(".fw-semibold").textContent = form.title.value;
-
-					const description = cells[0].querySelector("small");
+					if (title) {
+						title.textContent = form.title.value;
+					}
 
 					if (form.description.value.trim()) {
 						if (description) {
 							description.textContent = form.description.value;
 						} else {
 							const small = document.createElement("small");
-
-							small.className = "text-muted";
+							small.className = "text-muted task-description";
 							small.textContent = form.description.value;
-
-							cells[0].appendChild(small);
+							row.querySelector(".task-title-cell").appendChild(small);
 						}
 					} else if (description) {
 						description.remove();
 					}
 
-					cells[2].innerHTML = getPriorityBadge(form.priority.value);
-					cells[3].innerHTML = getStatusBadge(form.status.value);
-					cells[4].textContent = formatDate(form.due_date.value);
+					if (priority) {
+						priority.innerHTML = getPriorityBadge(form.priority.value);
+					}
+
+					if (status) {
+						status.innerHTML = getStatusBadge(form.status.value);
+					}
+
+					if (estimatedDuration) {
+						estimatedDuration.textContent = formatDuration(Number(form.estimated_duration.value) * 60);
+					}
+
+					if (dueDate) {
+						dueDate.textContent = formatDate(form.due_date.value);
+					}
 				}
 
 				showAlert(data.message);
 			})
-			.catch((error) => {
+			.catch(error => {
 				console.error("Edit error:", error);
-
 				showAlert(error.message || "Unable to update task.", "danger");
 			})
 			.finally(() => {
@@ -345,8 +374,8 @@ if (editTaskForm) {
 	});
 }
 
-document.querySelectorAll(".delete-task-btn").forEach((button) => {
-	button.addEventListener("click", function () {
+document.querySelectorAll(".delete-task-btn").forEach(button => {
+	button.addEventListener("click", function() {
 		deleteTaskId = this.dataset.taskId;
 
 		if (deleteModal) {
@@ -358,7 +387,7 @@ document.querySelectorAll(".delete-task-btn").forEach((button) => {
 const confirmDeleteButton = document.getElementById("confirmDeleteBtn");
 
 if (confirmDeleteButton) {
-	confirmDeleteButton.addEventListener("click", function () {
+	confirmDeleteButton.addEventListener("click", function() {
 		if (!deleteTaskId) {
 			return;
 		}
@@ -371,11 +400,11 @@ if (confirmDeleteButton) {
 		fetch(taskUrls.delete + taskId, {
 			method: "POST",
 			headers: {
-				"X-Requested-With": "XMLHttpRequest",
-			},
+				"X-Requested-With": "XMLHttpRequest"
+			}
 		})
 			.then(parseResponse)
-			.then((data) => {
+			.then(data => {
 				if (!data.success) {
 					showAlert(data.message, "danger");
 					return;
@@ -386,12 +415,10 @@ if (confirmDeleteButton) {
 				}
 
 				document.getElementById("task-row-" + taskId)?.remove();
-
 				showAlert(data.message);
 			})
-			.catch((error) => {
+			.catch(error => {
 				console.error("Delete error:", error);
-
 				showAlert(error.message || "Unable to delete task.", "danger");
 			})
 			.finally(() => {

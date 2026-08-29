@@ -42,12 +42,12 @@ class Tasks_model extends CI_Model
 	{
 		return $this->db
 			->select('
-			tasks.*,
-			assigned_user.name AS assigned_to_name,
-			assigned_employee.employee_code AS assigned_to_code,
-			assigner_user.name AS assigned_by_name,
-			assigner_employee.employee_code AS assigned_by_code
-		')
+				tasks.*,
+				assigned_user.name AS assigned_to_name,
+				assigned_employee.employee_code AS assigned_to_code,
+				assigner_user.name AS assigned_by_name,
+				assigner_employee.employee_code AS assigned_by_code
+			')
 			->from('tasks')
 			->join(
 				'employees AS assigned_employee',
@@ -108,12 +108,12 @@ class Tasks_model extends CI_Model
 	{
 		$this->db
 			->select('
-			tasks.*,
-			assigned_to_employee.employee_code AS assigned_to_code,
-			assigned_to_user.name AS assigned_to_name,
-			assigned_by_employee.employee_code AS assigned_by_code,
-			assigned_by_user.name AS assigned_by_name
-		')
+				tasks.*,
+				assigned_to_employee.employee_code AS assigned_to_code,
+				assigned_to_user.name AS assigned_to_name,
+				assigned_by_employee.employee_code AS assigned_by_code,
+				assigned_by_user.name AS assigned_by_name
+			')
 			->from('tasks')
 			->join(
 				'employees AS assigned_to_employee',
@@ -142,10 +142,7 @@ class Tasks_model extends CI_Model
 		}
 
 		if (!empty($filters['assigned_to'])) {
-			$this->db->where(
-				'tasks.assigned_to',
-				(int) $filters['assigned_to']
-			);
+			$this->db->where('tasks.assigned_to', (int) $filters['assigned_to']);
 		}
 
 		if (!empty($filters['priority'])) {
@@ -178,5 +175,21 @@ class Tasks_model extends CI_Model
 		return $this->db
 			->where('id', $task_id)
 			->delete('tasks');
+	}
+
+	public function get_actual_duration($created_at, $completed_at)
+	{
+		if (!$created_at || !$completed_at) {
+			return null;
+		}
+
+		$start = strtotime($created_at);
+		$end = strtotime($completed_at);
+
+		if ($start === false || $end === false || $end < $start) {
+			return null;
+		}
+
+		return $end - $start;
 	}
 }

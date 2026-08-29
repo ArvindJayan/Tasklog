@@ -5,10 +5,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>TaskLog</title>
-
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
-
 	<style>
 		:root {
 			--tasklog-bg: #0b1120;
@@ -141,37 +139,24 @@
 	<?php $this->load->view('components/navbar'); ?>
 
 	<main>
-
 		<div class="container py-5">
-
 			<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
-
 				<div>
-
-					<h1 class="fw-bold mb-1">
-						Assigned Tasks
-					</h1>
-
-					<p class="text-secondary mb-0">
-						View and manage tasks you have assigned to your employees.
-					</p>
-
+					<h1 class="fw-bold mb-1">Assigned Tasks</h1>
+					<p class="text-secondary mb-0">View and manage tasks you have assigned to your employees.</p>
 				</div>
 
 				<button type="button" class="btn btn-info fw-semibold" data-bs-toggle="modal"
 					data-bs-target="#createTaskModal">
-
 					<i class="bi bi-plus-lg me-1"></i>
 					Assign Task
-
 				</button>
-
 			</div>
 
 			<div id="alertContainer"></div>
+
 			<form method="get" class="card bg-surface border-tasklog rounded-4 mb-4">
 				<div class="card-body p-4">
-
 					<h5 class="fw-bold text-white mb-3">
 						<i class="bi bi-funnel me-2 text-cyan"></i>
 						Filter Tasks
@@ -179,13 +164,9 @@
 
 					<div class="row g-3">
 						<div class="col-md-3">
-							<label class="form-label text-secondary">
-								Assigned To
-							</label>
-
+							<label class="form-label text-secondary">Assigned To</label>
 							<select name="assigned_to" class="form-select">
 								<option value="">All</option>
-
 								<?php foreach ($employees as $assigned_employee): ?>
 									<option value="<?= $assigned_employee->id; ?>" <?= (string) ($filters['assigned_to'] ?? '') === (string) $assigned_employee->id ? 'selected' : ''; ?>>
 										<?= html_escape($assigned_employee->name); ?>
@@ -195,54 +176,33 @@
 						</div>
 
 						<div class="col-md-3">
-							<label class="form-label text-secondary">
-								Priority
-							</label>
-
+							<label class="form-label text-secondary">Priority</label>
 							<select name="priority" class="form-select">
 								<option value="">All</option>
-								<option value="low" <?= ($filters['priority'] ?? '') === 'low' ? 'selected' : ''; ?>>
-									Low
+								<option value="low" <?= ($filters['priority'] ?? '') === 'low' ? 'selected' : ''; ?>>Low
 								</option>
 								<option value="medium" <?= ($filters['priority'] ?? '') === 'medium' ? 'selected' : ''; ?>>
-									Medium
+									Medium</option>
+								<option value="high" <?= ($filters['priority'] ?? '') === 'high' ? 'selected' : ''; ?>>High
 								</option>
-								<option value="high" <?= ($filters['priority'] ?? '') === 'high' ? 'selected' : ''; ?>>
-									High
-								</option>
-								<option value="critical" <?= ($filters['priority'] ?? '') === 'critical' ? 'selected' : ''; ?>>
-									Critical
-								</option>
+								<option value="critical" <?= ($filters['priority'] ?? '') === 'critical' ? 'selected' : ''; ?>>Critical</option>
 							</select>
 						</div>
 
 						<div class="col-md-3">
-							<label class="form-label text-secondary">
-								Status
-							</label>
-
+							<label class="form-label text-secondary">Status</label>
 							<select name="status" class="form-select">
 								<option value="">All</option>
 								<option value="pending" <?= ($filters['status'] ?? '') === 'pending' ? 'selected' : ''; ?>>
-									Pending
-								</option>
-								<option value="in_progress" <?= ($filters['status'] ?? '') === 'in_progress' ? 'selected' : ''; ?>>
-									In Progress
-								</option>
-								<option value="completed" <?= ($filters['status'] ?? '') === 'completed' ? 'selected' : ''; ?>>
-									Completed
-								</option>
-								<option value="cancelled" <?= ($filters['status'] ?? '') === 'cancelled' ? 'selected' : ''; ?>>
-									Cancelled
-								</option>
+									Pending</option>
+								<option value="in_progress" <?= ($filters['status'] ?? '') === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+								<option value="completed" <?= ($filters['status'] ?? '') === 'completed' ? 'selected' : ''; ?>>Completed</option>
+								<option value="cancelled" <?= ($filters['status'] ?? '') === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
 							</select>
 						</div>
 
 						<div class="col-md-3">
-							<label class="form-label text-secondary">
-								Due Date
-							</label>
-
+							<label class="form-label text-secondary">Due Date</label>
 							<input type="date" name="due_date" class="form-control"
 								value="<?= html_escape($filters['due_date'] ?? ''); ?>">
 						</div>
@@ -259,137 +219,108 @@
 							Clear
 						</a>
 					</div>
-
 				</div>
 			</form>
+
 			<div class="card bg-surface border-tasklog rounded-4">
-
 				<div class="card-body p-4">
-
 					<div class="d-flex justify-content-between align-items-center mb-4">
-
 						<div>
-
-							<h4 class="fw-bold mb-1 text-white">
-								My Assigned Tasks
-							</h4>
-
+							<h4 class="fw-bold mb-1 text-white">My Assigned Tasks</h4>
 							<p class="text-secondary mb-0">
-
 								<?= count($tasks); ?>
-
 								task<?= count($tasks) !== 1 ? 's' : ''; ?>
-
 								found
-
 							</p>
-
 						</div>
-
 					</div>
 
 					<?php if (empty($tasks)): ?>
-
 						<div class="text-center py-5">
-
 							<div class="fs-1 text-muted mb-3">
 								<i class="bi bi-clipboard-x"></i>
 							</div>
-
-							<h5 class="fw-semibold text-white">
-								No assigned tasks
-							</h5>
-
-							<p class="text-secondary mb-4">
-								You haven't assigned any tasks yet.
-							</p>
-
+							<h5 class="fw-semibold text-white">No assigned tasks</h5>
+							<p class="text-secondary mb-4">You haven't assigned any tasks yet.</p>
 							<button type="button" class="btn btn-info fw-semibold" data-bs-toggle="modal"
 								data-bs-target="#createTaskModal">
-
 								<i class="bi bi-plus-lg me-1"></i>
 								Assign Your First Task
-
 							</button>
-
 						</div>
-
 					<?php else: ?>
-
 						<div>
-
 							<table class="table table-dark table-borderless align-middle mb-0">
-
 								<thead>
-
 									<tr class="border-bottom border-tasklog">
-
-										<th class="px-4 py-3 text-nowrap">
-											Task
-										</th>
-
-										<th class="px-4 py-3 text-nowrap">
-											Assigned To
-										</th>
-
-										<th class="px-4 py-3 text-nowrap">
-											Priority
-										</th>
-
-										<th class="px-4 py-3 text-nowrap">
-											Status
-										</th>
-
-										<th class="px-4 py-3 text-nowrap">
-											Due Date
-										</th>
-
+										<th class="px-4 py-3 text-nowrap">Task</th>
+										<th class="px-4 py-3 text-nowrap">Assigned To</th>
+										<th class="px-4 py-3 text-nowrap">Priority</th>
+										<th class="px-4 py-3 text-nowrap">Status</th>
+										<th class="px-4 py-3 text-nowrap">Estimated</th>
+										<th class="px-4 py-3 text-nowrap">Actual</th>
+										<th class="px-4 py-3 text-nowrap">Due Date</th>
 										<th class="px-4 py-3 text-end"></th>
-
 									</tr>
-
 								</thead>
 
 								<tbody id="taskTableBody">
-
 									<?php foreach ($tasks as $task): ?>
+										<?php
+										$estimated_minutes = !empty($task->estimated_duration)
+											? floor((int) $task->estimated_duration / 60)
+											: 0;
+
+										$actual_minutes = !empty($task->actual_duration)
+											? floor((int) $task->actual_duration / 60)
+											: 0;
+
+										$format_duration = function ($minutes) {
+											if ($minutes <= 0) {
+												return 'Not specified';
+											}
+
+											$hours = floor($minutes / 60);
+											$remaining_minutes = $minutes % 60;
+
+											if ($hours > 0 && $remaining_minutes > 0) {
+												return $hours . 'h ' . $remaining_minutes . 'm';
+											}
+
+											if ($hours > 0) {
+												return $hours . 'h';
+											}
+
+											return $remaining_minutes . 'm';
+										};
+										?>
 
 										<tr class="task-row border-bottom border-tasklog" id="task-row-<?= $task->id; ?>">
-
 											<td class="px-4 py-3 task-title-cell">
-
 												<div class="fw-semibold text-white task-title">
 													<?= html_escape($task->title); ?>
 												</div>
 
 												<?php if (!empty($task->description)): ?>
-
 													<small class="text-muted task-description">
 														<?= html_escape($task->description); ?>
 													</small>
-
 												<?php endif; ?>
-
 											</td>
 
 											<td class="px-4 py-3">
-
 												<div class="fw-semibold text-white">
 													<?= html_escape($task->assigned_to_name ?? 'Unknown'); ?>
 												</div>
 
 												<?php if (!empty($task->assigned_to_code)): ?>
-
 													<small class="text-muted">
 														<?= html_escape($task->assigned_to_code); ?>
 													</small>
-
 												<?php endif; ?>
-
 											</td>
 
 											<td class="px-4 py-3 task-priority-cell">
-
 												<?php
 												$priority_classes = [
 													'low' => 'text-bg-secondary',
@@ -403,11 +334,9 @@
 													class="badge <?= $priority_classes[$task->priority] ?? 'text-bg-secondary'; ?>">
 													<?= ucfirst($task->priority); ?>
 												</span>
-
 											</td>
 
 											<td class="px-4 py-3 task-status-cell">
-
 												<?php
 												$status_classes = [
 													'pending' => 'text-bg-warning',
@@ -421,7 +350,14 @@
 													class="badge <?= $status_classes[$task->status] ?? 'text-bg-secondary'; ?>">
 													<?= ucwords(str_replace('_', ' ', $task->status)); ?>
 												</span>
+											</td>
 
+											<td class="px-4 py-3 text-secondary text-nowrap task-estimated-duration">
+												<?= $format_duration($estimated_minutes); ?>
+											</td>
+
+											<td class="px-4 py-3 text-secondary text-nowrap task-actual-duration">
+												<?= $format_duration($actual_minutes); ?>
 											</td>
 
 											<td class="px-4 py-3 text-secondary text-nowrap task-due-date">
@@ -431,16 +367,13 @@
 											</td>
 
 											<td class="px-4 py-3 text-end">
-
 												<div class="dropdown">
-
 													<button class="btn btn-menu" type="button" data-bs-toggle="dropdown"
 														aria-expanded="false">
 														<i class="bi bi-three-dots-vertical fs-5"></i>
 													</button>
 
 													<ul class="dropdown-menu dropdown-menu-end">
-
 														<li>
 															<button type="button" class="dropdown-item view-task-btn"
 																data-task-id="<?= $task->id; ?>">
@@ -466,35 +399,21 @@
 																Delete
 															</button>
 														</li>
-
 													</ul>
-
 												</div>
-
 											</td>
-
 										</tr>
-
 									<?php endforeach; ?>
-
 								</tbody>
-
 							</table>
-
 						</div>
-
 					<?php endif; ?>
-
 				</div>
-
 			</div>
-
 		</div>
-
 	</main>
 
 	<?php $this->load->view('tasks/modals'); ?>
-
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -508,7 +427,6 @@
 	</script>
 
 	<script src="<?= base_url('application/assets/js/tasks.js'); ?>"></script>
-
 </body>
 
 </html>

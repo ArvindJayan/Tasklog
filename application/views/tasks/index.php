@@ -5,10 +5,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>TaskLog</title>
-
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
-
 	<style>
 		:root {
 			--tasklog-bg: #0b1120;
@@ -141,17 +139,11 @@
 	<?php $this->load->view('components/navbar'); ?>
 
 	<main>
-
 		<div class="container py-5">
-
 			<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
-
 				<div>
 					<h1 class="fw-bold mb-1">My Tasks</h1>
-
-					<p class="text-secondary mb-0">
-						View and manage all your tasks.
-					</p>
+					<p class="text-secondary mb-0">View and manage all your tasks.</p>
 				</div>
 
 				<button type="button" class="btn btn-info fw-semibold" data-bs-toggle="modal"
@@ -159,127 +151,108 @@
 					<i class="bi bi-plus-lg me-1"></i>
 					New Task
 				</button>
-
 			</div>
 
 			<div id="alertContainer"></div>
 
 			<div class="card bg-surface border-tasklog rounded-4">
-
 				<div class="card-body p-4">
-
 					<div class="d-flex justify-content-between align-items-center mb-4">
-
 						<div>
-							<h4 class="fw-bold mb-1 text-white">
-								All Tasks
-							</h4>
-
+							<h4 class="fw-bold mb-1 text-white">All Tasks</h4>
 							<p class="text-secondary mb-0">
 								<?= count($tasks); ?>
 								task<?= count($tasks) !== 1 ? 's' : ''; ?>
 								found
 							</p>
 						</div>
-
 					</div>
 
 					<?php if (empty($tasks)): ?>
-
 						<div class="text-center py-5">
-
 							<div class="fs-1 text-muted mb-3">
 								<i class="bi bi-clipboard-x"></i>
 							</div>
-
-							<h5 class="fw-semibold text-white">
-								No tasks yet
-							</h5>
-
-							<p class="text-secondary mb-4">
-								You don't have any tasks assigned to you.
-							</p>
-
+							<h5 class="fw-semibold text-white">No tasks yet</h5>
+							<p class="text-secondary mb-4">You don't have any tasks assigned to you.</p>
 							<button type="button" class="btn btn-info fw-semibold" data-bs-toggle="modal"
 								data-bs-target="#createTaskModal">
 								<i class="bi bi-plus-lg me-1"></i>
 								Create Your First Task
 							</button>
-
 						</div>
-
 					<?php else: ?>
-
 						<div>
-
 							<table class="table table-dark table-borderless align-middle mb-0">
-
 								<thead>
-
 									<tr class="border-bottom border-tasklog">
-
-										<th class="px-4 py-3 text-nowrap">
-											Task
-										</th>
-
-										<th class="px-4 py-3 text-nowrap">
-											Priority
-										</th>
-
-										<th class="px-4 py-3 text-nowrap">
-											Status
-										</th>
-
-										<th class="px-4 py-3 text-nowrap">
-											Due Date
-										</th>
-
-										<th class="px-4 py-3 text-end">
-										</th>
-
+										<th class="px-4 py-3 text-nowrap">Task</th>
+										<th class="px-4 py-3 text-nowrap">Priority</th>
+										<th class="px-4 py-3 text-nowrap">Status</th>
+										<th class="px-4 py-3 text-nowrap">Estimated</th>
+										<th class="px-4 py-3 text-nowrap">Actual</th>
+										<th class="px-4 py-3 text-nowrap">Due Date</th>
+										<th class="px-4 py-3 text-end"></th>
 									</tr>
-
 								</thead>
 
 								<tbody id="taskTableBody">
-
 									<?php foreach ($tasks as $task): ?>
-
 										<?php
-										$employee_id = $this->Employee_model
-											->get_employee_by_user_id(
-												$this->session->userdata('user_id')
-											)->id;
+										$employee = $this->Employee_model->get_employee_by_user_id(
+											$this->session->userdata('user_id')
+										);
 
 										$can_edit =
-											(int) $task->assigned_to === (int) $employee_id
-											|| (int) $task->assigned_by === (int) $employee_id;
+											(int) $task->assigned_to === (int) $employee->id ||
+											(int) $task->assigned_by === (int) $employee->id;
 
 										$can_delete =
-											(int) $task->assigned_to === (int) $employee_id
-											|| (int) $task->assigned_by === (int) $employee_id;
+											(int) $task->assigned_to === (int) $employee->id ||
+											(int) $task->assigned_by === (int) $employee->id;
+
+										$estimated_minutes = !empty($task->estimated_duration)
+											? floor((int) $task->estimated_duration / 60)
+											: 0;
+
+										$actual_minutes = !empty($task->actual_duration)
+											? floor((int) $task->actual_duration / 60)
+											: 0;
+
+										$format_duration = function ($minutes) {
+											if ($minutes <= 0) {
+												return 'Not specified';
+											}
+
+											$hours = floor($minutes / 60);
+											$remaining_minutes = $minutes % 60;
+
+											if ($hours > 0 && $remaining_minutes > 0) {
+												return $hours . 'h ' . $remaining_minutes . 'm';
+											}
+
+											if ($hours > 0) {
+												return $hours . 'h';
+											}
+
+											return $remaining_minutes . 'm';
+										};
 										?>
 
 										<tr class="task-row border-bottom border-tasklog" id="task-row-<?= $task->id; ?>">
-
-											<td class="px-4 py-3">
-
-												<div class="fw-semibold text-white">
+											<td class="px-4 py-3 task-title-cell">
+												<div class="fw-semibold text-white task-title">
 													<?= html_escape($task->title); ?>
 												</div>
 
 												<?php if (!empty($task->description)): ?>
-
-													<small class="text-muted">
+													<small class="text-muted task-description">
 														<?= html_escape($task->description); ?>
 													</small>
-
 												<?php endif; ?>
-
 											</td>
 
-											<td class="px-4 py-3">
-
+											<td class="px-4 py-3 task-priority-cell">
 												<?php
 												$priority_classes = [
 													'low' => 'text-bg-secondary',
@@ -293,11 +266,9 @@
 													class="badge <?= $priority_classes[$task->priority] ?? 'text-bg-secondary'; ?>">
 													<?= ucfirst($task->priority); ?>
 												</span>
-
 											</td>
 
-											<td class="px-4 py-3">
-
+											<td class="px-4 py-3 task-status-cell">
 												<?php
 												$status_classes = [
 													'pending' => 'text-bg-warning',
@@ -311,52 +282,50 @@
 													class="badge <?= $status_classes[$task->status] ?? 'text-bg-secondary'; ?>">
 													<?= ucwords(str_replace('_', ' ', $task->status)); ?>
 												</span>
-
 											</td>
 
-											<td class="px-4 py-3 text-secondary text-nowrap">
+											<td class="px-4 py-3 text-secondary text-nowrap task-estimated-duration">
+												<?= $format_duration($estimated_minutes); ?>
+											</td>
+
+											<td class="px-4 py-3 text-secondary text-nowrap task-actual-duration">
+												<?= $format_duration($actual_minutes); ?>
+											</td>
+
+											<td class="px-4 py-3 text-secondary text-nowrap task-due-date">
 												<?= $task->due_date
 													? date('d M Y', strtotime($task->due_date))
 													: 'No due date'; ?>
 											</td>
 
 											<td class="px-4 py-3 text-end">
-
 												<div class="dropdown">
-
 													<button class="btn btn-menu" type="button" data-bs-toggle="dropdown"
 														aria-expanded="false">
 														<i class="bi bi-three-dots-vertical fs-5"></i>
 													</button>
 
 													<ul class="dropdown-menu dropdown-menu-end">
-
 														<li>
-
 															<button type="button" class="dropdown-item view-task-btn"
 																data-task-id="<?= $task->id; ?>">
 																View
 															</button>
-
 														</li>
 
 														<?php if ($can_edit): ?>
-
 															<li>
 																<button type="button" class="dropdown-item edit-task-btn"
 																	data-task-id="<?= $task->id; ?>">
 																	Edit
 																</button>
 															</li>
-
 														<?php endif; ?>
 
 														<?php if ($can_delete): ?>
-
 															<li>
 																<hr class="dropdown-divider border-tasklog">
 															</li>
-
 															<li>
 																<button type="button"
 																	class="dropdown-item text-danger delete-task-btn"
@@ -364,33 +333,19 @@
 																	Delete
 																</button>
 															</li>
-
 														<?php endif; ?>
-
 													</ul>
-
 												</div>
-
 											</td>
-
 										</tr>
-
 									<?php endforeach; ?>
-
 								</tbody>
-
 							</table>
-
 						</div>
-
 					<?php endif; ?>
-
 				</div>
-
 			</div>
-
 		</div>
-
 	</main>
 
 	<?php $this->load->view('tasks/modals'); ?>
@@ -407,7 +362,6 @@
 	</script>
 
 	<script src="<?= base_url('application/assets/js/tasks.js'); ?>"></script>
-
 </body>
 
 </html>
