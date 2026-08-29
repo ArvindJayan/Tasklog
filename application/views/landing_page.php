@@ -77,11 +77,12 @@
 		}
 
 		.feature-card {
-			transition: border-color 0.2s ease, transform 0.2s ease;
+			transition: border-color 0.5s ease, box-shadow 0.5s ease, transform 0.5s ease;
 		}
 
 		.feature-card:hover {
 			border-color: var(--tasklog-cyan) !important;
+			box-shadow: 1px 1px 10px #1fa4a8;
 			transform: translateY(-3px);
 		}
 
