@@ -7,15 +7,9 @@
 
 	<title>TaskLog</title>
 
-	<link
-		href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-		rel="stylesheet"
-	>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-	<link
-		href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-		rel="stylesheet"
-	>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
 
 	<style>
 		:root {
@@ -30,19 +24,6 @@
 
 		body {
 			background-color: var(--tasklog-bg);
-			color: var(--tasklog-text);
-		}
-
-		.navbar {
-			background-color: var(--tasklog-surface);
-			border-color: var(--tasklog-border) !important;
-		}
-
-		.navbar-brand {
-			color: var(--tasklog-text);
-		}
-
-		.navbar-brand:hover {
 			color: var(--tasklog-text);
 		}
 
@@ -109,41 +90,12 @@
 </head>
 
 <body>
-
-	<nav class="navbar navbar-dark border-bottom border-tasklog">
-		<div class="container py-2">
-
-			<a
-				class="navbar-brand fw-bold fs-3"
-				href="<?= site_url('dashboard'); ?>"
-			>
-				Task<span class="text-cyan">Log</span>
-			</a>
-
-			<div class="d-flex align-items-center gap-3">
-
-				<span class="text-secondary d-none d-md-block">
-					<?= html_escape($this->session->userdata('name')); ?>
-				</span>
-
-				<a
-					href="<?= site_url('auth/logout'); ?>"
-					class="btn btn-info fw-semibold"
-				>
-					Logout
-				</a>
-
-			</div>
-
-		</div>
-	</nav>
+	<?php $this->load->view('components/navbar'); ?>
 
 	<main>
 		<div class="container py-5">
 
-			<div
-				class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5"
-			>
+			<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
 
 				<div>
 					<h1 class="fw-bold mb-1">
@@ -155,10 +107,7 @@
 					</p>
 				</div>
 
-				<a
-					href="<?= site_url('dashboard'); ?>"
-					class="btn btn-outline-info fw-semibold"
-				>
+				<a href="<?= site_url('dashboard'); ?>" class="btn btn-outline-info fw-semibold">
 					Back to Dashboard
 				</a>
 
@@ -338,16 +287,12 @@
 
 											<td class="px-4 py-3 text-end">
 
-												<button
-													type="button"
-													class="btn btn-sm btn-info fw-semibold"
-													data-bs-toggle="modal"
-													data-bs-target="#editEmployeeModal"
+												<button type="button" class="btn btn-sm btn-info fw-semibold"
+													data-bs-toggle="modal" data-bs-target="#editEmployeeModal"
 													data-employee-id="<?= $employee->id; ?>"
 													data-employee-name="<?= html_escape($employee->name); ?>"
 													data-role-id="<?= $employee->role_id; ?>"
-													data-current-ra="<?= !empty($employee->ra_id) ? $employee->ra_id : ''; ?>"
-												>
+													data-current-ra="<?= !empty($employee->ra_id) ? $employee->ra_id : ''; ?>">
 													Edit
 												</button>
 
@@ -372,73 +317,42 @@
 		</div>
 	</main>
 
-	<div
-		class="modal fade"
-		id="editEmployeeModal"
-		tabindex="-1"
-		aria-labelledby="editEmployeeModalLabel"
-		aria-hidden="true"
-	>
+	<div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel"
+		aria-hidden="true">
 
 		<div class="modal-dialog modal-dialog-centered">
 
 			<div class="modal-content">
 
-				<form
-					action="<?= site_url('admin/update_employee'); ?>"
-					method="POST"
-				>
+				<form action="<?= site_url('admin/update_employee'); ?>" method="POST">
 
 					<div class="modal-header">
 
 						<div>
 
-							<h5
-								class="modal-title fw-bold"
-								id="editEmployeeModalLabel"
-							>
+							<h5 class="modal-title fw-bold" id="editEmployeeModalLabel">
 								Edit Employee
 							</h5>
 
-							<small
-								class="text-secondary"
-								id="employeeName"
-							></small>
+							<small class="text-secondary" id="employeeName"></small>
 
 						</div>
 
-						<button
-							type="button"
-							class="btn-close"
-							data-bs-dismiss="modal"
-							aria-label="Close"
-						></button>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
 					</div>
 
 					<div class="modal-body">
 
-						<input
-							type="hidden"
-							name="employee_id"
-							id="employeeId"
-						>
+						<input type="hidden" name="employee_id" id="employeeId">
 
 						<div class="mb-3">
 
-							<label
-								for="role_id"
-								class="form-label text-secondary"
-							>
+							<label for="role_id" class="form-label text-secondary">
 								Role
 							</label>
 
-							<select
-								class="form-select"
-								name="role_id"
-								id="role_id"
-								required
-							>
+							<select class="form-select" name="role_id" id="role_id" required>
 
 								<option value="3">
 									Employee
@@ -452,23 +366,13 @@
 
 						</div>
 
-						<div
-							class="mb-3"
-							id="raContainer"
-						>
+						<div class="mb-3" id="raContainer">
 
-							<label
-								for="ra_id"
-								class="form-label text-secondary"
-							>
+							<label for="ra_id" class="form-label text-secondary">
 								Reporting Authority
 							</label>
 
-							<select
-								class="form-select"
-								name="ra_id"
-								id="ra_id"
-							>
+							<select class="form-select" name="ra_id" id="ra_id">
 
 								<option value="">
 									Select RA
@@ -502,18 +406,11 @@
 
 					<div class="modal-footer">
 
-						<button
-							type="button"
-							class="btn btn-outline-light"
-							data-bs-dismiss="modal"
-						>
+						<button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
 							Cancel
 						</button>
 
-						<button
-							type="submit"
-							class="btn btn-info fw-semibold"
-						>
+						<button type="submit" class="btn btn-info fw-semibold">
 							Save
 						</button>
 

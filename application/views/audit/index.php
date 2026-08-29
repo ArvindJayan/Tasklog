@@ -25,19 +25,6 @@
 			color: var(--tasklog-text);
 		}
 
-		.navbar {
-			background-color: var(--tasklog-surface);
-			border-color: var(--tasklog-border) !important;
-		}
-
-		.navbar-brand {
-			color: var(--tasklog-text);
-		}
-
-		.navbar-brand:hover {
-			color: var(--tasklog-text);
-		}
-
 		.text-cyan {
 			color: var(--tasklog-cyan) !important;
 		}
@@ -161,35 +148,11 @@
 </head>
 
 <body>
-
-	<nav class="navbar navbar-dark border-bottom border-tasklog">
-		<div class="container py-2">
-
-			<a class="navbar-brand fw-bold fs-3" href="<?= site_url('dashboard'); ?>">
-				Task<span class="text-cyan">Log</span>
-			</a>
-
-			<div class="d-flex align-items-center gap-3">
-
-				<span class="text-secondary d-none d-md-block">
-					<?= html_escape($this->session->userdata('name')); ?>
-				</span>
-
-				<a href="<?= site_url('auth/logout'); ?>" class="btn btn-info fw-semibold">
-					Logout
-				</a>
-
-			</div>
-
-		</div>
-	</nav>
-
+	<?php $this->load->view('components/navbar'); ?>
+	
 	<main>
-
 		<div class="container py-5">
-
 			<div class="d-flex justify-content-between align-items-center mb-4">
-
 				<div>
 					<h1 class="fw-bold mb-1">
 						Audit Logs
@@ -203,7 +166,6 @@
 				<a href="<?= site_url('dashboard'); ?>" class="btn btn-outline-info fw-semibold">
 					Go Back
 				</a>
-
 			</div>
 
 			<div class="card bg-surface border-tasklog rounded-4 mb-4">
@@ -290,11 +252,7 @@
 								From
 							</label>
 
-							<input
-								type="date"
-								id="dateFrom"
-								class="form-control"
-							>
+							<input type="date" id="dateFrom" class="form-control">
 
 						</div>
 
@@ -304,11 +262,7 @@
 								To
 							</label>
 
-							<input
-								type="date"
-								id="dateTo"
-								class="form-control"
-							>
+							<input type="date" id="dateTo" class="form-control">
 
 						</div>
 
@@ -316,19 +270,11 @@
 
 					<div class="d-flex justify-content-end gap-2 mt-4">
 
-						<button
-							type="button"
-							id="resetFilters"
-							class="btn btn-outline-light"
-						>
+						<button type="button" id="resetFilters" class="btn btn-outline-light">
 							Reset
 						</button>
 
-						<button
-							type="button"
-							id="applyFilters"
-							class="btn btn-info fw-semibold"
-						>
+						<button type="button" id="applyFilters" class="btn btn-info fw-semibold">
 							<i class="bi bi-funnel me-1"></i>
 							Apply Filters
 						</button>
@@ -414,13 +360,8 @@
 
 	</main>
 
-	<div
-		class="modal fade"
-		id="auditDetailModal"
-		tabindex="-1"
-		aria-labelledby="auditDetailModalLabel"
-		aria-hidden="true"
-	>
+	<div class="modal fade" id="auditDetailModal" tabindex="-1" aria-labelledby="auditDetailModalLabel"
+		aria-hidden="true">
 
 		<div class="modal-dialog modal-lg modal-dialog-centered">
 
@@ -436,12 +377,7 @@
 						<small class="text-secondary" id="auditDetailAction"></small>
 					</div>
 
-					<button
-						type="button"
-						class="btn-close"
-						data-bs-dismiss="modal"
-						aria-label="Close"
-					></button>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
 				</div>
 
@@ -457,10 +393,7 @@
 									User
 								</div>
 
-								<div
-									class="audit-detail-value fw-semibold"
-									id="auditDetailUser"
-								></div>
+								<div class="audit-detail-value fw-semibold" id="auditDetailUser"></div>
 
 							</div>
 
@@ -474,10 +407,7 @@
 									Action
 								</div>
 
-								<div
-									class="audit-detail-value"
-									id="auditDetailActionValue"
-								></div>
+								<div class="audit-detail-value" id="auditDetailActionValue"></div>
 
 							</div>
 
@@ -491,10 +421,7 @@
 									Entity
 								</div>
 
-								<div
-									class="audit-detail-value"
-									id="auditDetailEntity"
-								></div>
+								<div class="audit-detail-value" id="auditDetailEntity"></div>
 
 							</div>
 
@@ -508,10 +435,7 @@
 									Entity ID
 								</div>
 
-								<div
-									class="audit-detail-value"
-									id="auditDetailEntityId"
-								></div>
+								<div class="audit-detail-value" id="auditDetailEntityId"></div>
 
 							</div>
 
@@ -525,10 +449,7 @@
 									IP Address
 								</div>
 
-								<div
-									class="audit-detail-value"
-									id="auditDetailIp"
-								></div>
+								<div class="audit-detail-value" id="auditDetailIp"></div>
 
 							</div>
 
@@ -542,10 +463,7 @@
 									Date
 								</div>
 
-								<div
-									class="audit-detail-value"
-									id="auditDetailDate"
-								></div>
+								<div class="audit-detail-value" id="auditDetailDate"></div>
 
 							</div>
 
@@ -559,10 +477,7 @@
 									User Agent
 								</div>
 
-								<div
-									class="audit-detail-value"
-									id="auditDetailUserAgent"
-								></div>
+								<div class="audit-detail-value" id="auditDetailUserAgent"></div>
 
 							</div>
 
@@ -576,10 +491,7 @@
 							Old Values
 						</h6>
 
-						<div
-							id="auditOldValues"
-							class="audit-json"
-						></div>
+						<div id="auditOldValues" class="audit-json"></div>
 
 					</div>
 
@@ -589,10 +501,7 @@
 							New Values
 						</h6>
 
-						<div
-							id="auditNewValues"
-							class="audit-json"
-						></div>
+						<div id="auditNewValues" class="audit-json"></div>
 
 					</div>
 
@@ -600,11 +509,7 @@
 
 				<div class="modal-footer">
 
-					<button
-						type="button"
-						class="btn btn-info fw-semibold"
-						data-bs-dismiss="modal"
-					>
+					<button type="button" class="btn btn-info fw-semibold" data-bs-dismiss="modal">
 						Close
 					</button>
 

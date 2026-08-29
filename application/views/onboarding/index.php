@@ -46,6 +46,8 @@
 	</style>
 </head>
 <body class="text-light">
+	<?php $this->load->view('components/navbar'); ?>
+	
 	<div class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
 		<div class="col-12 col-sm-10 col-md-7 col-lg-5">
 			<div class="card onboarding-card border rounded-4 shadow">
