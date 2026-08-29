@@ -59,7 +59,7 @@
 		.landing-hero {
 			position: relative;
 			min-height: calc(100vh - 73px);
-			background-image: url('<?= base_url('application/assets/landing_page/landing_page.jpeg'); ?>');
+			background-image: url('<?= base_url('application/assets/landing_page/background.jpeg'); ?>');
 			background-size: cover;
 			background-position: center;
 			background-repeat: no-repeat;
