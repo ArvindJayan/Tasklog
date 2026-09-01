@@ -106,12 +106,12 @@
 			<div class="container py-5 landing-content">
 				<div class="row align-items-center g-5">
 					<div class="col-lg-6">
-						<h1 class="display-2 fw-bold lh-1 mb-4">Work smarter.<br><span class="text-cyan">Stay on
-								track.</span></h1>
+						<h1 class="display-2 fw-bold lh-1 mb-4">Work smarter.<br><span class="text-cyan">
+								Stay on track.</span></h1>
 						<p class="lead text-secondary mb-4">TaskLog gives employees and reporting authorities a simple
 							way to assign, manage, and track work from one place.</p>
-						<a href="<?= site_url('auth/login'); ?>" class="btn btn-info btn-lg fw-semibold">Access
-							Dashboard</a>
+						<a href="<?= site_url('auth/login'); ?>" class="btn btn-info btn-lg fw-semibold">
+							Access Dashboard</a>
 					</div>
 
 					<div class="col-lg-6">
